@@ -5,6 +5,7 @@ export interface PIIEntity {
     entity_type: string;
     page: number;
     bbox: number[] | null;
+    bboxes?: number[][] | null;
     start_char: number;
     end_char: number;
     confidence: number;

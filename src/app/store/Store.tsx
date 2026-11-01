@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { login, fetchUser, logout, register, refreshToken } from "../lib/api";
+import { API_URL } from "../lib/documentApi";
 
 interface AuthState {
     user: { id: string; username: string; email: string; role: string; exp?: number; created_at?: string } | null;
@@ -18,7 +19,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     user: null,
     userAuth: false,
     isLoading: true,
-    url: process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000',
+    url: API_URL,
     setUser: (user) => set({ user }),
     loginUser: async (email, password) => {
         const data = await login(email, password, useAuthStore.getState().url);

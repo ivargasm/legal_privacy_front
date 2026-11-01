@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { Download, Building2, User, MapPin, Mail, Phone, FileDigit, ShieldOff, List, Trash2, X, MessageSquareQuote } from 'lucide-react';
+import { Download, Building2, User, MapPin, Mail, Phone, FileDigit, ShieldOff, List, Trash2, X, CreditCard, Scale, BadgeCheck, Highlighter, Sparkles } from 'lucide-react';
 import { useState, useRef } from 'react';
 import ChatModal from './ChatModal';
 
@@ -20,6 +20,10 @@ const ENTITY_CONFIG: Record<string, { icon: React.ReactNode, color: string }> = 
     EMAIL: { icon: <Mail className="w-4 h-4 mr-2" />, color: 'bg-amber-500/20 text-amber-700 dark:text-amber-400' },
     PHONE: { icon: <Phone className="w-4 h-4 mr-2" />, color: 'bg-rose-500/20 text-rose-700 dark:text-rose-400' },
     ID_FISCAL: { icon: <FileDigit className="w-4 h-4 mr-2" />, color: 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-400' },
+    ID_OFICIAL: { icon: <BadgeCheck className="w-4 h-4 mr-2" />, color: 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-400' },
+    CUENTA_BANCARIA: { icon: <CreditCard className="w-4 h-4 mr-2" />, color: 'bg-teal-500/20 text-teal-700 dark:text-teal-400' },
+    EXPEDIENTE: { icon: <Scale className="w-4 h-4 mr-2" />, color: 'bg-orange-500/20 text-orange-700 dark:text-orange-400' },
+    MANUAL: { icon: <Highlighter className="w-4 h-4 mr-2" />, color: 'bg-pink-500/20 text-pink-700 dark:text-pink-400' },
 };
 
 export default function Workspace() {
@@ -91,7 +95,6 @@ export default function Workspace() {
             document.body.removeChild(a);
 
             toast.success("Documento descargado con éxito");
-            reset(); // Clear workspace after download
         } catch (error) {
             const e = error as Error;
             console.error(e);
@@ -142,12 +145,8 @@ export default function Workspace() {
         addEntity({
             text: popupState.text,
             entity_type: 'MANUAL',
-            page: 0, // Backend will recalculate page and bbox using enrich_entities during Phase 3 logic if needed, but wait!
-            // Actually, backend needs bbox. But PyMuPDF search_for handles text matching!
-            // We just send bbox=null and let backend ignore bbox? 
-            // Wait, our backend Phase 3 REQUIRES bbox to redact strictly!
-            // Let's send bbox=null. In Phase 3, backend skips redaction if bbox is null.
-            // That's a bug! We need to enrich MANUAL entities or fallback to string search.
+            // El backend enriquece automáticamente page y bbox en /documents/redact cuando bbox es null
+            page: 0,
             bbox: null,
             start_char: popupState.start,
             end_char: popupState.end,
@@ -232,10 +231,16 @@ export default function Workspace() {
                         <List className="w-4 h-4 mr-2" />
                         Ver Excepciones
                     </Button>
-                    <Button variant="outline" onClick={reset}>Cancelar</Button>
-                    <Button variant="secondary" className="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 border-none" onClick={() => setIsChatOpen(true)}>
-                        <MessageSquareQuote className="w-4 h-4 mr-2" />
-                        Chatear Seguro
+                    <Button variant="outline" onClick={reset}>
+                        Cargar otro archivo
+                    </Button>
+                    <Button
+                        variant="secondary"
+                        className="bg-violet-100 text-violet-800 hover:bg-violet-200 border-none font-medium"
+                        onClick={() => setIsChatOpen(true)}
+                    >
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Copiloto y Chat Seguro
                     </Button>
                     <Button onClick={handleDownload} disabled={isDownloading}>
                         <Download className="w-4 h-4 mr-2" />
@@ -370,12 +375,13 @@ export default function Workspace() {
                 </Card>
             </div>
             
-            {/* Chat Modal */}
-            <ChatModal 
-                isOpen={isChatOpen} 
-                onClose={() => setIsChatOpen(false)} 
-                text={extractedText} 
-                entities={entities.filter(e => !e.isBlacklisted)} 
+            {/* Chat & Copiloto Modal */}
+            <ChatModal
+                isOpen={isChatOpen}
+                onClose={() => setIsChatOpen(false)}
+                text={extractedText}
+                entities={entities.filter(e => !e.isBlacklisted)}
+                fileName={file.name}
             />
         </div>
     );

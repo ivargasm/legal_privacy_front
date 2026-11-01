@@ -1,6 +1,34 @@
 import { PIIEntity } from '../store/documentStore';
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+export const API_URL =
+    process.env.NEXT_PUBLIC_API_URL ||
+    process.env.NEXT_PUBLIC_BACKEND_URL ||
+    'http://localhost:8000';
+
+async function throwHandledApiError(res: Response, fallbackMessage: string): Promise<never> {
+    const errorData = await res.json().catch(() => null);
+    const detail = typeof errorData?.detail === 'string' ? errorData.detail : null;
+
+    if (res.status === 401) {
+        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth/')) {
+            window.location.href = '/auth/login';
+        }
+        throw new Error(detail || 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+    }
+    if (res.status === 403) {
+        throw new Error(detail || 'No tienes permisos suficientes para realizar esta acción.');
+    }
+    if (res.status === 413) {
+        throw new Error(detail || 'El archivo excede el tamaño máximo permitido (25 MB).');
+    }
+    if (res.status === 429) {
+        throw new Error(
+            detail || 'Demasiadas solicitudes seguidas. Espera unos segundos e inténtalo de nuevo.'
+        );
+    }
+
+    throw new Error(detail || fallbackMessage);
+}
 
 export async function analyzeDocument(file: File) {
     const formData = new FormData();
@@ -13,8 +41,62 @@ export async function analyzeDocument(file: File) {
     });
 
     if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.detail || 'Error al analizar el documento');
+        await throwHandledApiError(res, 'Error al analizar el documento');
+    }
+
+    return res.json();
+}
+
+export interface PublicLawItem {
+    id: number;
+    title: string;
+    source?: string | null;
+    created_at?: string | null;
+    chunks_count: number;
+    embedding_model: string;
+    embedding_dim?: number | null;
+    chunking_strategy?: string | null;
+    is_structured?: boolean;
+    fts_ready?: boolean;
+    needs_reindex: boolean;
+}
+
+export interface PublicLawsResponse {
+    embedding_model: string;
+    is_local: boolean;
+    provider: string;
+    ollama_pull_model?: string | null;
+    chunking_strategy_active?: string;
+    can_manage?: boolean;
+    laws: PublicLawItem[];
+    outdated_count: number;
+}
+
+export async function getPublicLaws(): Promise<PublicLawsResponse> {
+    const res = await fetch(`${API_URL}/api/v1/library/laws`, {
+        method: 'GET',
+        credentials: 'include',
+    });
+
+    if (!res.ok) {
+        await throwHandledApiError(res, 'Error al consultar las leyes indexadas');
+    }
+
+    return res.json();
+}
+
+export async function reindexPublicLaws(documentId?: number) {
+    const res = await fetch(`${API_URL}/api/v1/library/reindex`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(documentId !== undefined ? { document_id: documentId } : {}),
+    });
+
+    if (!res.ok) {
+        await throwHandledApiError(res, 'Error al re-indexar leyes públicas');
     }
 
     return res.json();
@@ -31,8 +113,7 @@ export async function uploadPublicLaw(file: File) {
     });
 
     if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.detail || 'Error al subir la ley');
+        await throwHandledApiError(res, 'Error al subir la ley');
     }
 
     return res.json();
@@ -50,8 +131,7 @@ export async function redactDocument(file: File, entities: PIIEntity[]) {
     });
 
     if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.detail || 'Error al anonimizar el documento');
+        await throwHandledApiError(res, 'Error al anonimizar el documento');
     }
 
     return res.blob();
@@ -68,8 +148,7 @@ export async function blacklistEntity(text: string) {
     });
 
     if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.detail || 'Error al añadir a excepciones');
+        await throwHandledApiError(res, 'Error al añadir a excepciones');
     }
 
     return res.json();
@@ -82,8 +161,7 @@ export async function getBlacklist() {
     });
 
     if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.detail || 'Error al obtener la lista de excepciones');
+        await throwHandledApiError(res, 'Error al obtener la lista de excepciones');
     }
 
     return res.json();
@@ -96,14 +174,28 @@ export async function deleteFromBlacklist(entityId: number) {
     });
 
     if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.detail || 'Error al eliminar de excepciones');
+        await throwHandledApiError(res, 'Error al eliminar de excepciones');
     }
 
     return res.json();
 }
 
-export async function maskDocument(text: string, entities: PIIEntity[]) {
+export interface RepresentableParty {
+    token: string;
+    role: string;
+    display_label: string;
+    entity_type: string;
+}
+
+export type AdvisoryMode = 'qa' | 'review' | 'draft' | 'compliance';
+
+export interface MaskDocumentResponse {
+    masked_text: string;
+    session_id: string;
+    parties?: RepresentableParty[];
+}
+
+export async function maskDocument(text: string, entities: PIIEntity[]): Promise<MaskDocumentResponse> {
     const res = await fetch(`${API_URL}/api/v1/documents/mask`, {
         method: 'POST',
         credentials: 'include',
@@ -114,27 +206,71 @@ export async function maskDocument(text: string, entities: PIIEntity[]) {
     });
 
     if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.detail || 'Error al enmascarar el documento');
+        await throwHandledApiError(res, 'Error al enmascarar el documento');
     }
 
-    return res.json(); // { masked_text, session_id }
+    return res.json();
 }
 
-export async function chatDocument(sessionId: string, message: string) {
+export interface ChatDocumentResponse {
+    reply: string;
+    masked_user_message?: string;
+    raw_masked_reply?: string;
+    effective_mode?: AdvisoryMode;
+}
+
+export async function chatDocument(
+    sessionId: string,
+    message: string,
+    options?: {
+        advisoryMode?: AdvisoryMode;
+        clientPartyToken?: string | null;
+    }
+): Promise<ChatDocumentResponse> {
     const res = await fetch(`${API_URL}/api/v1/chat`, {
         method: 'POST',
         credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ session_id: sessionId, message }),
+        body: JSON.stringify({
+            session_id: sessionId,
+            message,
+            advisory_mode: options?.advisoryMode ?? null,
+            client_party_token: options?.clientPartyToken || null,
+        }),
     });
 
     if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.detail || 'Error en el chat');
+        await throwHandledApiError(res, 'Error en el chat');
     }
 
-    return res.json(); // { reply }
+    return res.json();
+}
+
+export async function exportAdvisoryDocx(params: {
+    title: string;
+    content: string;
+    sourceFilename?: string;
+    partyLabel?: string;
+}): Promise<Blob> {
+    const res = await fetch(`${API_URL}/api/v1/documents/export-advisory`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            title: params.title,
+            content: params.content,
+            source_filename: params.sourceFilename || null,
+            party_label: params.partyLabel || null,
+        }),
+    });
+
+    if (!res.ok) {
+        await throwHandledApiError(res, 'Error al exportar el dictamen en Word (.docx)');
+    }
+
+    return res.blob();
 }

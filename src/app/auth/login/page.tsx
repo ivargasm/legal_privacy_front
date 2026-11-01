@@ -48,9 +48,18 @@ export default function LoginPage() {
         validateUser();
     }, [userValid]);
 
+    const getSafePostLoginPath = () => {
+        if (typeof window === "undefined") return "/studio";
+        const from = new URLSearchParams(window.location.search).get("from");
+        if (from && from.startsWith("/") && !from.startsWith("//") && !from.startsWith("/auth")) {
+            return from;
+        }
+        return "/studio";
+    };
+
     useEffect(() => {
         if ((userAuth || user)) {
-            router.push('/profile');
+            router.replace(getSafePostLoginPath());
         }
     }, [user, userAuth, router]);
 
@@ -60,7 +69,7 @@ export default function LoginPage() {
 
         try {
             await loginUser(data.email, data.password, url);
-            router.push("/profile");
+            router.replace(getSafePostLoginPath());
         } catch (err: unknown) {
             if (err instanceof Error) {
                 setGlobalError(err.message);

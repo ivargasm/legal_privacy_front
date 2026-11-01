@@ -13,8 +13,13 @@ export default function Uploader() {
     const [isUploading, setIsUploading] = useState(false);
 
     const handleFile = async (file: File) => {
-        if (!file.name.endsWith('.pdf') && !file.name.endsWith('.docx')) {
+        const lowerName = file.name.toLowerCase();
+        if (!lowerName.endsWith('.pdf') && !lowerName.endsWith('.docx')) {
             toast.error("Formato no soportado. Sube un PDF o DOCX.");
+            return;
+        }
+        if (file.size > 25 * 1024 * 1024) {
+            toast.error("El archivo supera el tamaño máximo permitido de 25 MB.");
             return;
         }
 
