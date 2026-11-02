@@ -59,7 +59,7 @@ export function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    const { pathname } = request.nextUrl;
+    const { pathname, searchParams } = request.nextUrl;
     const token = request.cookies.get('access_token')?.value;
     const isValidCookie = hasUnexpiredAccessCookie(token);
 
@@ -72,6 +72,13 @@ export function middleware(request: NextRequest) {
         const loginUrl = new URL('/auth/login', request.url);
         loginUrl.searchParams.set('from', pathname);
         return NextResponse.redirect(loginUrl);
+    }
+
+    // Si el usuario solicitó cerrar sesión explícitamente, borrar la cookie y permitir acceso a /auth/login
+    if (isAuthPage && searchParams.has('logout')) {
+        const res = NextResponse.next();
+        res.cookies.delete('access_token');
+        return res;
     }
 
     if (isAuthPage && isValidCookie) {

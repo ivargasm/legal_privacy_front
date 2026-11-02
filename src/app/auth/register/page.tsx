@@ -188,7 +188,7 @@ export default function RegisterPage() {
                         <Button 
                             type="submit" 
                             disabled={isSubmitting}
-                            className="w-full bg-gray-500 dark:bg-gray-700 border-gray-300 dark:border-gray-600 hover:bg-primary/90 text-white"
+                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-xs"
                         >
                             {isSubmitting ? (
                                 <>

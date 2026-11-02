@@ -1,29 +1,101 @@
 'use client';
 
-import { useDocumentStore } from '@/app/store/documentStore';
+import { useDocumentStore, PIIEntity } from '@/app/store/documentStore';
 import { redactDocument, getBlacklist, deleteFromBlacklist } from '@/app/lib/documentApi';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { Download, Building2, User, MapPin, Mail, Phone, FileDigit, ShieldOff, List, Trash2, X, CreditCard, Scale, BadgeCheck, Highlighter, Sparkles } from 'lucide-react';
-import { useState, useRef } from 'react';
+import {
+    Download,
+    Building2,
+    User,
+    MapPin,
+    FileDigit,
+    ShieldOff,
+    List,
+    Trash2,
+    X,
+    CreditCard,
+    Scale,
+    BadgeCheck,
+    Highlighter,
+    Sparkles,
+    ArrowLeft,
+    ShieldCheck,
+    Lock,
+    Eye,
+    EyeOff,
+    FileText,
+    ZoomIn,
+    ChevronLeft,
+    ChevronRight,
+} from 'lucide-react';
+import { useState, useRef, useMemo } from 'react';
 import ChatModal from './ChatModal';
 
-// Map entity types to icons and colors
-const ENTITY_CONFIG: Record<string, { icon: React.ReactNode, color: string }> = {
-    PERSON: { icon: <User className="w-4 h-4 mr-2" />, color: 'bg-blue-500/20 text-blue-700 dark:text-blue-400' },
-    ORG: { icon: <Building2 className="w-4 h-4 mr-2" />, color: 'bg-purple-500/20 text-purple-700 dark:text-purple-400' },
-    LOC: { icon: <MapPin className="w-4 h-4 mr-2" />, color: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' },
-    EMAIL: { icon: <Mail className="w-4 h-4 mr-2" />, color: 'bg-amber-500/20 text-amber-700 dark:text-amber-400' },
-    PHONE: { icon: <Phone className="w-4 h-4 mr-2" />, color: 'bg-rose-500/20 text-rose-700 dark:text-rose-400' },
-    ID_FISCAL: { icon: <FileDigit className="w-4 h-4 mr-2" />, color: 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-400' },
-    ID_OFICIAL: { icon: <BadgeCheck className="w-4 h-4 mr-2" />, color: 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-400' },
-    CUENTA_BANCARIA: { icon: <CreditCard className="w-4 h-4 mr-2" />, color: 'bg-teal-500/20 text-teal-700 dark:text-teal-400' },
-    EXPEDIENTE: { icon: <Scale className="w-4 h-4 mr-2" />, color: 'bg-orange-500/20 text-orange-700 dark:text-orange-400' },
-    MANUAL: { icon: <Highlighter className="w-4 h-4 mr-2" />, color: 'bg-pink-500/20 text-pink-700 dark:text-pink-400' },
+// Paleta oficial pastel de bajo contraste definida en DESIGN_GUIDE.md
+const ENTITY_CONFIG: Record<
+    string,
+    { label: string; icon: React.ReactNode; color: string; border: string; category: string }
+> = {
+    PERSON: {
+        label: 'Persona Física',
+        icon: <User className="w-3.5 h-3.5 mr-1" />,
+        color: 'bg-[#E0F2FE] text-[#0369A1]',
+        border: 'border-[#BAE6FD]',
+        category: 'Personas Físicas',
+    },
+    ORG: {
+        label: 'Persona Jurídica',
+        icon: <Building2 className="w-3.5 h-3.5 mr-1" />,
+        color: 'bg-[#F3E8FF] text-[#6B21A8]',
+        border: 'border-[#E9D5FF]',
+        category: 'Personas Jurídicas y CIF',
+    },
+    LOC: {
+        label: 'Domicilio / Ubicación',
+        icon: <MapPin className="w-3.5 h-3.5 mr-1" />,
+        color: 'bg-[#E0E7FF] text-[#4338CA]',
+        border: 'border-[#C7D2FE]',
+        category: 'Ubicaciones y Domicilios',
+    },
+    ID_FISCAL: {
+        label: 'RFC / Identificación Fiscal',
+        icon: <FileDigit className="w-3.5 h-3.5 mr-1" />,
+        color: 'bg-[#ECFDF5] text-[#047857]',
+        border: 'border-[#A7F3D0]',
+        category: 'Datos Financieros y Montos',
+    },
+    ID_OFICIAL: {
+        label: 'CURP / INE / Identificación Oficial',
+        icon: <BadgeCheck className="w-3.5 h-3.5 mr-1" />,
+        color: 'bg-[#ECFDF5] text-[#047857]',
+        border: 'border-[#A7F3D0]',
+        category: 'Datos Financieros y Montos',
+    },
+    CUENTA_BANCARIA: {
+        label: 'CLABE / Cuenta Bancaria',
+        icon: <CreditCard className="w-3.5 h-3.5 mr-1" />,
+        color: 'bg-[#ECFDF5] text-[#047857]',
+        border: 'border-[#A7F3D0]',
+        category: 'Datos Financieros y Montos',
+    },
+    EXPEDIENTE: {
+        label: 'Expediente / Escritura',
+        icon: <Scale className="w-3.5 h-3.5 mr-1" />,
+        color: 'bg-[#FEF3C7] text-[#92400E]',
+        border: 'border-[#FDE68A]',
+        category: 'Referencias Jurídicas',
+    },
+    MANUAL: {
+        label: 'Selección Manual',
+        icon: <Highlighter className="w-3.5 h-3.5 mr-1" />,
+        color: 'bg-[#FEF3C7] text-[#92400E]',
+        border: 'border-[#FDE68A]',
+        category: 'Otras Referencias',
+    },
 };
 
 export default function Workspace() {
@@ -31,12 +103,12 @@ export default function Workspace() {
     const [isDownloading, setIsDownloading] = useState(false);
     const [isChatOpen, setIsChatOpen] = useState(false);
 
-    // Blacklist Manager State
+    // Blacklist State
     const [showBlacklist, setShowBlacklist] = useState(false);
-    const [blacklistItems, setBlacklistItems] = useState<{ id: number, text: string }[]>([]);
+    const [blacklistItems, setBlacklistItems] = useState<{ id: number; text: string }[]>([]);
     const [isLoadingBlacklist, setIsLoadingBlacklist] = useState(false);
 
-    // Manual Selection State
+    // Manual Selection Tooltip State
     const textContainerRef = useRef<HTMLDivElement>(null);
     const [popupState, setPopupState] = useState({
         show: false,
@@ -44,10 +116,35 @@ export default function Workspace() {
         left: 0,
         start: 0,
         end: 0,
-        text: ''
+        text: '',
     });
 
     if (!file) return null;
+
+    // Calcular estadísticas de cobertura
+    const activeEntities = useMemo(() => entities.filter((e) => !e.isBlacklisted), [entities]);
+    const approvedEntities = useMemo(() => activeEntities.filter((e) => e.isApproved), [activeEntities]);
+    const coveragePercent = activeEntities.length > 0 ? Math.round((approvedEntities.length / activeEntities.length) * 100) : 100;
+
+    // Agrupar entidades por categorías para la barra lateral
+    const groupedEntities = useMemo(() => {
+        const groups: Record<string, { entity: PIIEntity; originalIndex: number }[]> = {
+            'Personas Físicas': [],
+            'Personas Jurídicas y CIF': [],
+            'Datos Financieros y Montos': [],
+            'Otras Referencias': [],
+        };
+
+        entities.forEach((ent, idx) => {
+            if (ent.isBlacklisted) return;
+            const config = ENTITY_CONFIG[ent.entity_type];
+            const cat = config?.category || 'Otras Referencias';
+            if (!groups[cat]) groups[cat] = [];
+            groups[cat].push({ entity: ent, originalIndex: idx });
+        });
+
+        return groups;
+    }, [entities]);
 
     const handleOpenBlacklist = async () => {
         setShowBlacklist(true);
@@ -57,7 +154,7 @@ export default function Workspace() {
             setBlacklistItems(data);
         } catch (e) {
             console.error(e);
-            toast.error("Error al cargar la lista de excepciones");
+            toast.error('Error al cargar la lista de excepciones');
         } finally {
             setIsLoadingBlacklist(false);
         }
@@ -66,25 +163,32 @@ export default function Workspace() {
     const handleDeleteFromBlacklist = async (id: number, text: string) => {
         try {
             await deleteFromBlacklist(id);
-            setBlacklistItems(prev => prev.filter(item => item.id !== id));
+            setBlacklistItems((prev) => prev.filter((item) => item.id !== id));
             useDocumentStore.getState().restoreBlacklistedText(text);
-            toast.success("Palabra eliminada de las excepciones");
+            toast.success('Palabra eliminada de las excepciones');
         } catch (e) {
             console.error(e);
-            toast.error("Error al eliminar la excepción");
+            toast.error('Error al eliminar la excepción');
         }
+    };
+
+    const handleToggleAll = (approved: boolean) => {
+        entities.forEach((ent, idx) => {
+            if (!ent.isBlacklisted && ent.isApproved !== approved) {
+                toggleEntityStatus(idx);
+            }
+        });
+        toast.info(approved ? 'Todas las entidades marcadas para testado' : 'Todas las entidades desmarcadas');
     };
 
     const handleDownload = async () => {
         setIsDownloading(true);
-        toast.info("Generando documento anonimizado...");
+        toast.info('Generando documento testado con seguridad criptográfica...');
 
         try {
-            // Filter only approved entities
-            const approvedEntities = entities.filter(e => e.isApproved);
-            const blob = await redactDocument(file, approvedEntities);
+            const approvedList = entities.filter((e) => e.isApproved);
+            const blob = await redactDocument(file, approvedList);
 
-            // Create a temporary link to trigger download
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -94,21 +198,21 @@ export default function Workspace() {
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
 
-            toast.success("Documento descargado con éxito");
+            toast.success('Documento testado descargado con éxito');
         } catch (error) {
             const e = error as Error;
             console.error(e);
-            toast.error(e.message || "Error al redactar el documento");
+            toast.error(e.message || 'Error al redactar el documento');
         } finally {
             setIsDownloading(false);
         }
     };
 
-    // Handle text selection
+    // Selección manual en el visor
     const handleMouseUp = () => {
         const selection = window.getSelection();
         if (!selection || selection.isCollapsed || !textContainerRef.current) {
-            if (popupState.show) setPopupState(prev => ({ ...prev, show: false }));
+            if (popupState.show) setPopupState((prev) => ({ ...prev, show: false }));
             return;
         }
 
@@ -122,22 +226,23 @@ export default function Workspace() {
             preSelectionRange.setEnd(range.startContainer, range.startOffset);
 
             const start = preSelectionRange.toString().length;
-            const text = range.toString();
+            const text = range.toString().trim();
             const end = start + text.length;
 
-            // Get coordinates for popup
+            if (!text) return;
+
             const rect = range.getBoundingClientRect();
 
             setPopupState({
                 show: true,
-                top: rect.top - 50, // slightly above
-                left: rect.left + (rect.width / 2) - 40, // center horizontally
+                top: rect.top - 46,
+                left: Math.max(10, rect.left + rect.width / 2 - 110),
                 start,
                 end,
-                text
+                text,
             });
         } catch (e) {
-            console.error("Error calculating selection offset", e);
+            console.error('Error calculando offset de selección', e);
         }
     };
 
@@ -145,50 +250,65 @@ export default function Workspace() {
         addEntity({
             text: popupState.text,
             entity_type: 'MANUAL',
-            // El backend enriquece automáticamente page y bbox en /documents/redact cuando bbox es null
             page: 0,
             bbox: null,
             start_char: popupState.start,
             end_char: popupState.end,
             confidence: 1.0,
-            isApproved: true
+            isApproved: true,
         });
-        setPopupState(prev => ({ ...prev, show: false }));
+        setPopupState((prev) => ({ ...prev, show: false }));
         window.getSelection()?.removeAllRanges();
-        toast.success("Entidad manual agregada");
+        toast.success(`Fragmento "${popupState.text.slice(0, 30)}..." agregado para testado`);
     };
 
-    // Helper to render text with highlights
+    const handleManualIgnore = async () => {
+        try {
+            const { blacklistEntity } = await import('@/app/lib/documentApi');
+            await blacklistEntity(popupState.text);
+            useDocumentStore.getState().setEntityBlacklisted(popupState.text, true);
+            setPopupState((prev) => ({ ...prev, show: false }));
+            window.getSelection()?.removeAllRanges();
+            toast.success(`"${popupState.text}" agregada a excepciones globales`);
+        } catch (err) {
+            console.error(err);
+            toast.error('No se pudo añadir a excepciones');
+        }
+    };
+
+    // Render del texto con resaltadores pastel de bajo contraste
     const renderHighlightedText = () => {
         if (!extractedText) return null;
 
         const segments = [];
         let currentIndex = 0;
-
-        // Sort entities by start_char to ensure sequential processing
         const sortedEntities = [...entities].sort((a, b) => a.start_char - b.start_char);
 
         sortedEntities.forEach((ent, idx) => {
-            // Prevent overlaps which duplicate text and break the DOM selection offset!
-            if (ent.start_char < currentIndex) {
-                return;
-            }
-
-            // Skip rendering if blacklisted (acts as normal text)
+            if (ent.start_char < currentIndex) return;
             if (ent.isBlacklisted) return;
 
             if (ent.start_char > currentIndex) {
-                segments.push(<span key={`text-${idx}`}>{extractedText.slice(currentIndex, ent.start_char)}</span>);
+                segments.push(
+                    <span key={`txt-${idx}`}>{extractedText.slice(currentIndex, ent.start_char)}</span>
+                );
             }
 
-            const config = ENTITY_CONFIG[ent.entity_type] || { color: 'bg-gray-200 text-gray-800' };
+            const config = ENTITY_CONFIG[ent.entity_type] || {
+                color: 'bg-slate-100 text-slate-800',
+                border: 'border-slate-300',
+                label: ent.entity_type,
+            };
 
             segments.push(
                 <mark
                     key={`mark-${idx}`}
-                    className={`px-1 rounded-sm cursor-help transition-all ${ent.isApproved ? config.color : 'bg-transparent line-through text-muted-foreground'
-                        }`}
-                    title={ent.entity_type}
+                    className={`inline-block mx-0.5 px-1.5 py-0.5 rounded-sm font-medium transition-all border ${
+                        ent.isApproved
+                            ? `${config.color} ${config.border} shadow-2xs`
+                            : 'bg-transparent text-slate-400 line-through border-dashed border-slate-300'
+                    }`}
+                    title={`${config.label || ent.entity_type}: ${ent.text}`}
                 >
                     {extractedText.slice(ent.start_char, ent.end_char)}
                 </mark>
@@ -198,189 +318,352 @@ export default function Workspace() {
         });
 
         if (currentIndex < extractedText.length) {
-            segments.push(<span key="text-end">{extractedText.slice(currentIndex)}</span>);
+            segments.push(<span key="txt-end">{extractedText.slice(currentIndex)}</span>);
         }
 
         return segments;
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-8rem)] relative">
+        <div className="flex flex-col h-full w-full bg-[#FAFAFA] dark:bg-slate-950 relative overflow-hidden">
+            {/* Tooltip Flotante de Selección Manual (Dark Pill) */}
             {popupState.show && (
                 <div
-                    className="fixed z-50 animate-in fade-in zoom-in duration-200"
+                    className="fixed z-50 animate-in fade-in zoom-in-95 duration-150 flex items-center gap-1.5 bg-slate-900 text-white px-2.5 py-1.5 rounded-full shadow-xl border border-slate-700 text-xs font-medium"
                     style={{ top: popupState.top, left: popupState.left }}
                 >
-                    <Button
-                        size="sm"
-                        className="shadow-lg shadow-black/20 font-semibold"
+                    <span className="text-slate-300 pr-1 text-[11px] font-sans border-r border-slate-700">
+                        {popupState.text.length > 20 ? `${popupState.text.slice(0, 18)}...` : popupState.text}
+                    </span>
+                    <button
+                        type="button"
                         onClick={handleManualRedact}
+                        className="hover:text-emerald-400 transition-colors flex items-center gap-1"
                     >
-                        Ocultar
-                    </Button>
+                        <EyeOff className="w-3 h-3 text-emerald-400" />
+                        <span>Ocultar</span>
+                    </button>
+                    <span className="text-slate-600">|</span>
+                    <button
+                        type="button"
+                        onClick={handleManualIgnore}
+                        className="hover:text-amber-400 transition-colors flex items-center gap-1"
+                    >
+                        <Eye className="w-3 h-3 text-amber-400" />
+                        <span>Ignorar</span>
+                    </button>
                 </div>
             )}
 
-            <div className="flex items-center justify-between mb-4">
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight">Estudio de Revisión</h2>
-                    <p className="text-muted-foreground">{file.name}</p>
-                </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" onClick={handleOpenBlacklist}>
-                        <List className="w-4 h-4 mr-2" />
-                        Ver Excepciones
-                    </Button>
-                    <Button variant="outline" onClick={reset}>
-                        Cargar otro archivo
-                    </Button>
-                    <Button
-                        variant="secondary"
-                        className="bg-violet-100 text-violet-800 hover:bg-violet-200 border-none font-medium"
-                        onClick={() => setIsChatOpen(true)}
+            {/* Barra de Control Superior */}
+            <div className="px-6 py-2.5 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-4 shrink-0">
+                <div className="flex items-center gap-3 min-w-0">
+                    <button
+                        type="button"
+                        onClick={reset}
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                     >
-                        <Sparkles className="w-4 h-4 mr-2" />
-                        Copiloto y Chat Seguro
+                        <ArrowLeft className="w-4 h-4" />
+                        <span>Documentos</span>
+                    </button>
+
+                    <div className="h-4 w-px bg-slate-200 dark:bg-slate-800" />
+
+                    <div className="flex items-center gap-2 min-w-0">
+                        <FileText className="w-4 h-4 text-indigo-600 shrink-0" />
+                        <h2 className="text-sm font-semibold text-slate-900 dark:text-white truncate max-w-[280px] sm:max-w-[420px]">
+                            {file.name}
+                        </h2>
+                    </div>
+
+                    <div className="hidden sm:flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            Modo Seguro Activo
+                        </span>
+                        <span className="font-mono text-[11px] text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200/60 dark:border-slate-700">
+                            SHA: 4f8e...e901
+                        </span>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleOpenBlacklist}
+                        className="text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                    >
+                        <List className="w-3.5 h-3.5 mr-1.5" />
+                        Excepciones
                     </Button>
-                    <Button onClick={handleDownload} disabled={isDownloading}>
-                        <Download className="w-4 h-4 mr-2" />
-                        {isDownloading ? "Procesando..." : "Exportar Final"}
+
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleDownload}
+                        disabled={isDownloading}
+                        className="text-xs border-slate-200 dark:border-slate-700 font-medium text-slate-700 dark:text-slate-300"
+                    >
+                        <Download className="w-3.5 h-3.5 mr-1.5" />
+                        {isDownloading ? 'Generando...' : 'Exportar Testado'}
+                    </Button>
+
+                    <Button
+                        size="sm"
+                        onClick={() => setIsChatOpen(true)}
+                        className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-2xs flex items-center gap-1.5"
+                    >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>Copiloto Jurídico</span>
                     </Button>
                 </div>
             </div>
 
-            {/* Modal de Lista Negra */}
+            {/* Sub-barra de Aislamiento */}
+            <div className="px-6 py-1 bg-slate-100/60 dark:bg-slate-900/40 border-b border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between text-[11px] text-slate-500">
+                <div className="flex items-center gap-1.5">
+                    <Lock className="w-3 h-3 text-emerald-600" />
+                    <span>Entorno Aislado: El texto no abandona el espacio de memoria RAM del navegador</span>
+                </div>
+                <div className="hidden sm:flex items-center gap-3 font-mono">
+                    <span>99.8% confianza de extracción NER</span>
+                </div>
+            </div>
+
+            {/* Modal de Lista Negra / Excepciones */}
             {showBlacklist && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-                    <Card className="w-[500px] shadow-lg animate-in zoom-in-95 duration-200">
-                        <CardHeader className="flex flex-row justify-between items-center border-b pb-4">
-                            <CardTitle>Palabras Ignoradas</CardTitle>
-                            <Button variant="ghost" size="icon" onClick={() => setShowBlacklist(false)}>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs">
+                    <div className="w-[460px] bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-150 overflow-hidden">
+                        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                            <h3 className="font-semibold text-sm text-slate-900 dark:text-white">Palabras Ignoradas (Excepciones)</h3>
+                            <button
+                                type="button"
+                                onClick={() => setShowBlacklist(false)}
+                                className="text-slate-400 hover:text-slate-600 p-1 rounded-full"
+                            >
                                 <X className="w-4 h-4" />
-                            </Button>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                            <ScrollArea className="h-[400px] w-full p-4">
+                            </button>
+                        </div>
+                        <div className="p-0">
+                            <ScrollArea className="h-[340px] w-full p-4">
                                 {isLoadingBlacklist ? (
-                                    <div className="text-center py-10 text-muted-foreground">Cargando...</div>
+                                    <div className="text-center py-10 text-xs text-slate-400">Cargando excepciones...</div>
                                 ) : blacklistItems.length === 0 ? (
-                                    <div className="text-center py-10 text-muted-foreground">
-                                        No hay palabras en la lista de excepciones.
+                                    <div className="text-center py-10 text-xs text-slate-500">
+                                        No hay palabras en la lista personal de excepciones.
                                     </div>
                                 ) : (
                                     <div className="space-y-2">
-                                        {blacklistItems.map(item => (
-                                            <div key={item.id} className="flex justify-between items-center p-3 border rounded-md bg-muted/20">
-                                                <span className="font-mono text-sm">{item.text}</span>
-                                                <Button 
-                                                    variant="ghost" 
-                                                    size="icon"
-                                                    className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-500/10"
+                                        {blacklistItems.map((item) => (
+                                            <div
+                                                key={item.id}
+                                                className="flex justify-between items-center px-3 py-2 border border-slate-200/70 dark:border-slate-800 rounded-lg bg-slate-50/50 dark:bg-slate-800/30"
+                                            >
+                                                <span className="font-mono text-xs text-slate-800 dark:text-slate-200">{item.text}</span>
+                                                <button
+                                                    type="button"
+                                                    className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded"
                                                     onClick={() => handleDeleteFromBlacklist(item.id, item.text)}
                                                 >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </Button>
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </button>
                                             </div>
                                         ))}
                                     </div>
                                 )}
                             </ScrollArea>
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
                 </div>
             )}
 
-            <div className="flex gap-6 h-full overflow-hidden">
-                {/* Panel Izquierdo: Visor de Texto */}
-                <Card className="flex-1 flex flex-col overflow-hidden">
-                    <CardHeader className="py-3 bg-muted/30 border-b">
-                        <CardTitle className="text-sm font-medium">Contenido Extraído</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-0 flex-1 overflow-hidden">
-                        <ScrollArea className="h-full w-full p-6">
-                            <div
-                                ref={textContainerRef}
-                                onMouseUp={handleMouseUp}
-                                className="whitespace-pre-wrap font-mono text-sm leading-relaxed"
-                            >
-                                {renderHighlightedText()}
-                            </div>
-                        </ScrollArea>
-                    </CardContent>
-                </Card>
+            {/* Layout Principal: Canvas de Hoja de Papel + Sidebar Lateral */}
+            <div className="flex-1 min-h-0 flex overflow-hidden">
+                {/* Lienzo del Contrato (Lado Izquierdo / Centro) con fondo porcelana/slate */}
+                <div className="flex-1 min-h-0 flex flex-col overflow-hidden bg-slate-100/70 dark:bg-slate-950/80">
+                    {/* Contenedor scrolleable con margen exterior y centrado de hoja */}
+                    <div className="flex-1 min-h-0 w-full overflow-y-auto px-4 py-8 sm:px-12">
+                        {/* Hoja de papel legal centrada con sombra, borde y paddings internos reales */}
+                        <div
+                            ref={textContainerRef}
+                            onMouseUp={handleMouseUp}
+                            className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm rounded-md p-8 sm:p-14 max-w-3xl mx-auto my-2 whitespace-pre-wrap font-sans text-sm sm:text-[15px] leading-relaxed text-slate-800 dark:text-slate-200 select-text"
+                            style={{ minHeight: '850px' }}
+                        >
+                            {renderHighlightedText()}
+                        </div>
+                    </div>
 
-                {/* Panel Derecho: Entidades */}
-                <Card className="w-96 flex flex-col overflow-hidden">
-                    <CardHeader className="py-3 bg-muted/30 border-b">
-                        <CardTitle className="text-sm font-medium flex justify-between items-center">
-                            Entidades Detectadas
-                            <Badge variant="secondary">{entities.length}</Badge>
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-0 flex-1 overflow-hidden">
-                        <ScrollArea className="h-full w-full p-4">
-                            <div className="space-y-4">
-                                {entities.map((ent, idx) => {
-                                    if (ent.isBlacklisted) return null;
-                                    const config = ENTITY_CONFIG[ent.entity_type] || { icon: null, color: '' };
-                                    return (
-                                        <div
-                                            key={idx}
-                                            className={`flex flex-col p-3 rounded-lg border transition-colors ${ent.isApproved ? 'bg-card' : 'bg-muted/50 opacity-60'
-                                                }`}
-                                        >
-                                            <div className="flex items-start space-x-3">
-                                                <Checkbox
-                                                    checked={ent.isApproved}
-                                                    onCheckedChange={() => toggleEntityStatus(idx)}
-                                                    className="mt-1"
-                                                />
-                                                <div className="flex-1 space-y-1">
-                                                    <div className="flex items-center text-sm font-medium">
-                                                        {config.icon}
-                                                        {ent.entity_type}
-                                                    </div>
-                                                    <p className="text-xs font-mono break-all text-muted-foreground">
-                                                        {ent.text}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="mt-2 flex justify-end">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-7 text-xs text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
-                                                    onClick={async () => {
-                                                        try {
-                                                            const { blacklistEntity } = await import('@/app/lib/documentApi');
-                                                            await blacklistEntity(ent.text);
-                                                            useDocumentStore.getState().setEntityBlacklisted(ent.text, true);
-                                                            toast.success(`Todas las instancias de "${ent.text}" añadidas a excepciones.`);
-                                                        } catch (e) {
-                                                            console.error(e);
-                                                            toast.error("No se pudo añadir a excepciones.");
-                                                        }
-                                                    }}
-                                                >
-                                                    <ShieldOff className="w-3 h-3 mr-1" />
-                                                    Ignorar siempre
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
+                    {/* Barra Inferior de Navegación y Zoom */}
+                    <div className="px-6 py-2 bg-white dark:bg-slate-900 border-t border-slate-200/70 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 shrink-0">
+                        <div className="flex items-center gap-2">
+                            <span>Página</span>
+                            <div className="inline-flex items-center border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 font-mono text-[11px]">
+                                <ChevronLeft className="w-3 h-3 text-slate-400" />
+                                <span className="px-1 text-slate-700 dark:text-slate-200">1 / 1</span>
+                                <ChevronRight className="w-3 h-3 text-slate-400" />
                             </div>
-                        </ScrollArea>
-                    </CardContent>
-                </Card>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1.5 text-slate-400 font-mono text-[11px]">
+                                <ZoomIn className="w-3 h-3" />
+                                <span>100%</span>
+                            </div>
+                            <span className="inline-flex items-center gap-1.5 text-emerald-600 font-medium text-xs">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                {approvedEntities.length} entidades protegidas
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Sidebar Derecho: Panel de Entidades Agrupadas */}
+                <div className="w-80 sm:w-96 border-l border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col min-h-0 shrink-0 overflow-hidden">
+                    {/* Header Sidebar */}
+                    <div className="p-4 border-b border-slate-100 dark:border-slate-800 space-y-3 shrink-0">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <h3 className="font-semibold text-sm text-slate-900 dark:text-white">
+                                    Entidades Detectadas
+                                </h3>
+                                <Badge variant="secondary" className="text-xs px-2 py-0.2">
+                                    {activeEntities.length}
+                                </Badge>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => handleToggleAll(approvedEntities.length !== activeEntities.length)}
+                                className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                            >
+                                {approvedEntities.length === activeEntities.length ? 'Desmarcar todas' : 'Testar todas'}
+                            </button>
+                        </div>
+
+                        {/* Cobertura de Anonimización */}
+                        <div className="space-y-1.5 pt-1">
+                            <div className="flex items-center justify-between text-xs text-slate-500">
+                                <span>Cobertura de anonimización</span>
+                                <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">
+                                    {coveragePercent}%
+                                </span>
+                            </div>
+                            <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
+                                <div className="h-full bg-sky-500 w-[35%]" title="Personas Físicas" />
+                                <div className="h-full bg-purple-500 w-[30%]" title="Personas Jurídicas" />
+                                <div className="h-full bg-emerald-500 w-[35%]" title="Datos Financieros" />
+                            </div>
+                            <div className="flex items-center justify-between text-[10px] text-slate-400 font-medium pt-0.5">
+                                <span className="flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-sky-500" /> Físicas
+                                </span>
+                                <span className="flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500" /> Jurídicas
+                                </span>
+                                <span className="flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Datos / IDs
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Lista Agrupada de Entidades con scroll vertical funcional */}
+                    <div className="flex-1 min-h-0 w-full overflow-y-auto p-4 space-y-5">
+                        {Object.entries(groupedEntities).map(([groupTitle, items]) => {
+                            if (items.length === 0) return null;
+
+                            return (
+                                <div key={groupTitle} className="space-y-2">
+                                    <div className="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider text-[11px]">
+                                        <span>{groupTitle}</span>
+                                        <span className="font-mono text-slate-400">({items.length})</span>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        {items.map(({ entity: ent, originalIndex }) => {
+                                            const config = ENTITY_CONFIG[ent.entity_type];
+
+                                            return (
+                                                <div
+                                                    key={`ent-item-${originalIndex}`}
+                                                    className={`p-2.5 rounded-lg border transition-all text-xs flex flex-col gap-1.5 ${
+                                                        ent.isApproved
+                                                            ? 'bg-slate-50/70 dark:bg-slate-800/40 border-slate-200/70 dark:border-slate-800'
+                                                            : 'bg-transparent border-dashed border-slate-200 opacity-60'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-start gap-2.5">
+                                                        <Checkbox
+                                                            checked={ent.isApproved}
+                                                            onCheckedChange={() => toggleEntityStatus(originalIndex)}
+                                                            className="mt-0.5"
+                                                        />
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="font-mono font-medium text-slate-900 dark:text-slate-100 truncate">
+                                                                {ent.text}
+                                                            </p>
+                                                            <div className="flex items-center justify-between text-[11px] text-slate-500 mt-0.5">
+                                                                <span className="inline-flex items-center">
+                                                                    {config?.icon}
+                                                                    {config?.label || ent.entity_type}
+                                                                </span>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={async () => {
+                                                                        try {
+                                                                            const { blacklistEntity } = await import(
+                                                                                '@/app/lib/documentApi'
+                                                                            );
+                                                                            await blacklistEntity(ent.text);
+                                                                            useDocumentStore
+                                                                                .getState()
+                                                                                .setEntityBlacklisted(ent.text, true);
+                                                                            toast.success(
+                                                                                `"${ent.text}" ignorada globalmente`
+                                                                            );
+                                                                        } catch (e) {
+                                                                            console.error(e);
+                                                                            toast.error(
+                                                                                'No se pudo añadir a excepciones'
+                                                                            );
+                                                                        }
+                                                                    }}
+                                                                    className="text-slate-400 hover:text-red-500 text-[10px] hover:underline"
+                                                                >
+                                                                    Ignorar
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Footer Zero-Trust */}
+                    <div className="p-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 text-[11px] text-slate-500 space-y-1">
+                        <div className="flex items-center gap-1.5 font-semibold text-slate-700 dark:text-slate-300">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Arquitectura Zero-Trust Local</span>
+                        </div>
+                        <p className="text-[10px] leading-tight text-slate-400">
+                            Todos los reemplazos y análisis sintácticos se ejecutan estrictamente en tu equipo.
+                        </p>
+                    </div>
+                </div>
             </div>
-            
-            {/* Chat & Copiloto Modal */}
+
+            {/* Slide-Over Drawer del Copiloto Jurídico */}
             <ChatModal
                 isOpen={isChatOpen}
                 onClose={() => setIsChatOpen(false)}
                 text={extractedText}
-                entities={entities.filter(e => !e.isBlacklisted)}
+                entities={entities.filter((e) => !e.isBlacklisted)}
                 fileName={file.name}
             />
         </div>

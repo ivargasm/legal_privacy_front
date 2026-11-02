@@ -3,16 +3,16 @@ import { login, fetchUser, logout, register, refreshToken } from "../lib/api";
 import { API_URL } from "../lib/documentApi";
 
 interface AuthState {
-    user: { id: string; username: string; email: string; role: string; exp?: number; created_at?: string } | null;
+    user: { id: string | number; username: string; email: string; role: string; exp?: number; created_at?: string } | null;
     setUser: (user: AuthState['user']) => void;
-    logout: () => void;
+    logout: () => Promise<void>;
     url: string;
     loginUser: (email: string, password: string, ur: string) => Promise<void>;
     userAuth: boolean;
     isLoading: boolean;
     userValid: () => Promise<void>;
     registerUser: (username: string, email: string, password: string) => Promise<unknown>;
-    renewSession: () => Promise<void>;
+    renewSession: () => Promise<boolean>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -50,14 +50,14 @@ export const useAuthStore = create<AuthState>((set) => ({
     // 📌 Cerrar sesión
     logout: async () => {
         try {
-            const data = await logout(useAuthStore.getState().url);
-            if (!data) {
-                return;
-            }
-            set({ user: null, userAuth: false });
-            window.location.href = "/auth/login";
+            await logout(useAuthStore.getState().url);
         } catch (error) {
-            console.error("Error al cerrar sesión", error);
+            console.error("Error al cerrar sesión:", error);
+        } finally {
+            set({ user: null, userAuth: false, isLoading: false });
+            if (typeof window !== "undefined") {
+                window.location.href = "/auth/login?logout=1";
+            }
         }
     },
     registerUser: async (username, email, password) => {
@@ -66,11 +66,16 @@ export const useAuthStore = create<AuthState>((set) => ({
     },
     renewSession: async () => {
         try {
-            await refreshToken(useAuthStore.getState().url);
-            await useAuthStore.getState().userValid(); // Vuelve a cargar el estado de usuario para actualizar exp
+            const updatedUser = await refreshToken(useAuthStore.getState().url);
+            if (updatedUser && updatedUser.exp) {
+                set({ user: updatedUser, userAuth: true });
+                return true;
+            }
+            return false;
         } catch (error) {
-            console.error("Error renovando sesión", error);
-            useAuthStore.getState().logout();
+            console.error("Error renovando sesión:", error);
+            await useAuthStore.getState().logout();
+            return false;
         }
     }
 

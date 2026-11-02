@@ -1,93 +1,84 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDocumentStore } from '@/app/store/documentStore';
+import { FileText, Loader2, Shield } from 'lucide-react';
 
 export default function WorkspaceSkeleton() {
     const { file } = useDocumentStore();
-    
+
     return (
-        <div className="flex flex-col h-[calc(100vh-8rem)] relative">
-            <div className="flex items-center justify-between mb-4">
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight">Estudio de Revisión</h2>
-                    {file ? (
-                        <p className="text-muted-foreground">{file.name}</p>
-                    ) : (
-                        <Skeleton className="h-4 w-48 mt-1" />
-                    )}
+        <div className="flex flex-col h-full bg-[#FAFAFA] dark:bg-slate-950 relative overflow-hidden -m-4 sm:-m-6">
+            {/* Top Bar Skeleton */}
+            <div className="px-6 py-2.5 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-4 shrink-0">
+                <div className="flex items-center gap-3">
+                    <Skeleton className="h-4 w-24" />
+                    <div className="h-4 w-px bg-slate-200 dark:bg-slate-800" />
+                    <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-indigo-400 animate-pulse" />
+                        <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[300px]">
+                            {file?.name || 'Analizando documento...'}
+                        </span>
+                    </div>
                 </div>
-                <div className="flex gap-2">
-                    <Skeleton className="h-10 w-[150px]" />
-                    <Skeleton className="h-10 w-[95px]" />
-                    <Skeleton className="h-10 w-[145px]" />
+
+                <div className="flex items-center gap-2">
+                    <Skeleton className="h-8 w-28 rounded-lg" />
+                    <Skeleton className="h-8 w-32 rounded-lg" />
                 </div>
             </div>
 
-            <div className="flex gap-6 h-full overflow-hidden">
-                {/* Panel Izquierdo: Visor de Texto */}
-                <Card className="flex-1 flex flex-col overflow-hidden">
-                    <CardHeader className="py-3 bg-muted/30 border-b">
-                        <CardTitle className="text-sm font-medium flex items-center justify-between">
-                            Extrayendo contenido y buscando entidades sensibles...
-                            <Skeleton className="h-4 w-24" />
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-8 flex-1 overflow-hidden">
-                        <div className="space-y-4 max-w-3xl">
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-[90%]" />
-                            <Skeleton className="h-4 w-[95%]" />
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-[80%]" />
-                            
-                            <div className="py-6 space-y-4">
-                                <Skeleton className="h-4 w-1/3" />
-                                <Skeleton className="h-4 w-1/2" />
-                            </div>
-                            
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-[85%]" />
-                            <Skeleton className="h-4 w-[90%]" />
-                            <Skeleton className="h-4 w-full" />
-                            
-                            <div className="py-6 space-y-4">
-                                <Skeleton className="h-4 w-full" />
-                                <Skeleton className="h-4 w-[80%]" />
-                                <Skeleton className="h-4 w-[60%]" />
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+            {/* Sub-barra Skeleton */}
+            <div className="px-6 py-1.5 bg-slate-100/60 dark:bg-slate-900/40 border-b border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between text-xs text-slate-500">
+                <div className="flex items-center gap-2">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600" />
+                    <span>Ejecutando Microsoft Presidio + SpaCy + Ollama localmente...</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-emerald-600 font-medium">
+                    <Shield className="w-3.5 h-3.5" />
+                    <span>Aislamiento 100% en memoria</span>
+                </div>
+            </div>
 
-                {/* Panel Derecho: Entidades */}
-                <Card className="w-96 flex flex-col overflow-hidden">
-                    <CardHeader className="py-3 bg-muted/30 border-b">
-                        <CardTitle className="text-sm font-medium flex justify-between items-center text-muted-foreground">
-                            Identificando PII
-                            <Skeleton className="h-5 w-8 rounded-full animate-pulse" />
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-4 flex-1 overflow-hidden">
-                        <div className="space-y-4">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                                <div key={i} className="flex flex-col p-4 rounded-lg border border-dashed bg-muted/10">
-                                    <div className="flex items-start space-x-3">
-                                        <Skeleton className="h-4 w-4 rounded-sm mt-1" />
-                                        <div className="flex-1 space-y-3">
-                                            <Skeleton className="h-4 w-24" />
-                                            <Skeleton className="h-3 w-48" />
-                                        </div>
-                                    </div>
-                                    <div className="mt-4 flex justify-end">
-                                        <Skeleton className="h-6 w-28" />
-                                    </div>
-                                </div>
-                            ))}
+            {/* Main Canvas + Sidebar Skeleton */}
+            <div className="flex-1 flex overflow-hidden">
+                {/* Paper Canvas Skeleton */}
+                <div className="flex-1 p-6 sm:p-10 overflow-hidden flex flex-col items-center">
+                    <div className="w-full max-w-4xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm rounded-sm p-10 sm:p-14 space-y-4">
+                        <Skeleton className="h-7 w-2/3 mb-6" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-[92%]" />
+                        <Skeleton className="h-4 w-[96%]" />
+                        <Skeleton className="h-4 w-[85%]" />
+                        <div className="py-4 space-y-3">
+                            <Skeleton className="h-5 w-1/3" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-[90%]" />
+                            <Skeleton className="h-4 w-[94%]" />
                         </div>
-                    </CardContent>
-                </Card>
+                        <div className="py-4 space-y-3">
+                            <Skeleton className="h-5 w-2/5" />
+                            <Skeleton className="h-4 w-[88%]" />
+                            <Skeleton className="h-4 w-[92%]" />
+                            <Skeleton className="h-4 w-3/4" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Sidebar Skeleton */}
+                <div className="w-80 sm:w-96 border-l border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-4 shrink-0 hidden md:block">
+                    <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                        <Skeleton className="h-4 w-36" />
+                        <Skeleton className="h-5 w-8 rounded-full" />
+                    </div>
+                    <Skeleton className="h-2 w-full rounded-full" />
+                    <div className="space-y-3 pt-2">
+                        <Skeleton className="h-14 w-full rounded-lg" />
+                        <Skeleton className="h-14 w-full rounded-lg" />
+                        <Skeleton className="h-14 w-full rounded-lg" />
+                        <Skeleton className="h-14 w-full rounded-lg" />
+                    </div>
+                </div>
             </div>
         </div>
     );

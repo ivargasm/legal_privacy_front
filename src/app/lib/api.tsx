@@ -25,12 +25,16 @@ export const login = async (email: string, password: string, url: string) => {
 };
 
 export const logout = async (url: string) => {
-    const res = await fetch(`${url}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-    });
-    if (!res.ok) throw new Error('Error al cerrar sesión');
-    return res;
+    try {
+        const res = await fetch(`${url}/auth/logout`, {
+            method: 'POST',
+            credentials: 'include',
+        });
+        return res;
+    } catch (e) {
+        console.warn('Network issue during logout request to backend:', e);
+        return null;
+    }
 };
 
 export async function register(username: string, email: string, password: string, url: string) {
@@ -97,6 +101,9 @@ export async function refreshToken(url: string) {
         method: 'POST',
         credentials: 'include',
     });
-    if (!res.ok) throw new Error('Error al renovar la sesión');
+    if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.detail || 'Error al renovar la sesión');
+    }
     return res.json();
 }
