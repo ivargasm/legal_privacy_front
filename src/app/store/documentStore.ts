@@ -20,6 +20,8 @@ interface DocumentState {
     entities: PIIEntity[];
     status: 'idle' | 'analyzing' | 'reviewing' | 'redacting' | 'error';
     errorMsg: string | null;
+    isQuotaExceeded: boolean;
+    quotaErrorMsg: string | null;
     
     setFile: (file: File) => void;
     setAnalysisResult: (text: string, entities: Omit<PIIEntity, 'isApproved' | 'isBlacklisted'>[]) => void;
@@ -29,6 +31,7 @@ interface DocumentState {
     toggleEntityStatus: (index: number) => void;
     setStatus: (status: DocumentState['status']) => void;
     setError: (msg: string) => void;
+    setQuotaExceeded: (val: boolean, msg?: string | null) => void;
     reset: () => void;
 }
 
@@ -39,8 +42,10 @@ export const useDocumentStore = create<DocumentState>((set) => ({
     entities: [],
     status: 'idle',
     errorMsg: null,
+    isQuotaExceeded: false,
+    quotaErrorMsg: null,
 
-    setFile: (file) => set({ file, fileName: file.name, status: 'analyzing', errorMsg: null }),
+    setFile: (file) => set({ file, fileName: file.name, status: 'analyzing', errorMsg: null, isQuotaExceeded: false }),
     
     setAnalysisResult: (text, entities) => {
         // Map backend entities to add the isApproved flag
@@ -81,6 +86,13 @@ export const useDocumentStore = create<DocumentState>((set) => ({
     
     setStatus: (status) => set({ status }),
     setError: (msg) => set({ errorMsg: msg, status: 'error' }),
+    setQuotaExceeded: (val, msg = null) =>
+        set({
+            isQuotaExceeded: val,
+            quotaErrorMsg: msg,
+            status: 'idle',
+            ...(val ? { file: null, fileName: '', extractedText: '', entities: [], errorMsg: null } : {}),
+        }),
     
-    reset: () => set({ file: null, fileName: '', extractedText: '', entities: [], status: 'idle', errorMsg: null })
+    reset: () => set({ file: null, fileName: '', extractedText: '', entities: [], status: 'idle', errorMsg: null, isQuotaExceeded: false, quotaErrorMsg: null })
 }));

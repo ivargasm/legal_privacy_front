@@ -3,6 +3,7 @@
 import Uploader from '@/components/studio/Uploader';
 import Workspace from '@/components/studio/Workspace';
 import WorkspaceSkeleton from '@/components/studio/WorkspaceSkeleton';
+import QuotaExceededModal from '@/components/studio/QuotaExceededModal';
 import { useDocumentStore } from '@/app/store/documentStore';
 import ProtectedRoute from '../components/ProtectedRoutes';
 
@@ -24,6 +25,7 @@ export default function StudioPage() {
                     <Workspace />
                 </main>
             )}
+            <QuotaExceededModal />
         </ProtectedRoute>
     );
 }

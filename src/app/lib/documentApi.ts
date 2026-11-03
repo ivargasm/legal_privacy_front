@@ -5,6 +5,16 @@ export const API_URL =
     process.env.NEXT_PUBLIC_BACKEND_URL ||
     'http://localhost:8000';
 
+export class ApiError extends Error {
+    status?: number;
+    isQuotaExceeded?: boolean;
+    constructor(message: string, status?: number, isQuotaExceeded?: boolean) {
+        super(message);
+        this.status = status;
+        this.isQuotaExceeded = isQuotaExceeded;
+    }
+}
+
 async function throwHandledApiError(res: Response, fallbackMessage: string): Promise<never> {
     const errorData = await res.json().catch(() => null);
     const detail = typeof errorData?.detail === 'string' ? errorData.detail : null;
@@ -13,7 +23,14 @@ async function throwHandledApiError(res: Response, fallbackMessage: string): Pro
         if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth/')) {
             window.location.href = '/auth/login';
         }
-        throw new Error(detail || 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+        throw new ApiError(detail || 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.', 401);
+    }
+    if (res.status === 402) {
+        throw new ApiError(
+            detail || 'Has alcanzado el límite de documentos de tu plan. Actualiza tu suscripción para continuar.',
+            402,
+            true
+        );
     }
     if (res.status === 403) {
         throw new Error(detail || 'No tienes permisos suficientes para realizar esta acción.');
@@ -30,13 +47,20 @@ async function throwHandledApiError(res: Response, fallbackMessage: string): Pro
     throw new Error(detail || fallbackMessage);
 }
 
-export async function analyzeDocument(file: File) {
+export async function analyzeDocument(file: File, activeOrgId?: number | null) {
     const formData = new FormData();
     formData.append('file', file);
+
+    const headers: Record<string, string> = {};
+    const orgId = activeOrgId || (typeof window !== 'undefined' ? localStorage.getItem('active_org_id') : null);
+    if (orgId) {
+        headers['X-Organization-Id'] = String(orgId);
+    }
 
     const res = await fetch(`${API_URL}/api/v1/documents/analyze`, {
         method: 'POST',
         credentials: 'include',
+        headers,
         body: formData,
     });
 

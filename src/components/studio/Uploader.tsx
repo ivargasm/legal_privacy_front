@@ -14,13 +14,13 @@ import {
     SlidersHorizontal,
 } from 'lucide-react';
 import { useDocumentStore } from '@/app/store/documentStore';
-import { analyzeDocument } from '@/app/lib/documentApi';
+import { analyzeDocument, ApiError } from '@/app/lib/documentApi';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 export default function Uploader() {
     const [isDragging, setIsDragging] = useState(false);
-    const { setFile, setAnalysisResult, setError } = useDocumentStore();
+    const { setFile, setAnalysisResult, setError, setQuotaExceeded } = useDocumentStore();
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -44,10 +44,23 @@ export default function Uploader() {
             setAnalysisResult(data.extracted_text, data.entities);
             toast.success("Documento analizado con éxito.");
         } catch (error: unknown) {
-            console.error(error);
             const msg = error instanceof Error ? error.message : "Error al procesar el archivo.";
-            setError(msg);
-            toast.error(msg);
+
+            // Compuerta de cuota / límite de plan de facturación
+            const isQuota =
+                (error instanceof ApiError && (error.status === 402 || error.isQuotaExceeded)) ||
+                msg.toLowerCase().includes('límite') ||
+                msg.toLowerCase().includes('plan gratuito') ||
+                msg.toLowerCase().includes('cuota');
+
+            if (isQuota) {
+                // No llamamos console.error para evitar el overlay de error de Next.js en entorno de desarrollo
+                setQuotaExceeded(true, msg);
+            } else {
+                console.error("Error al procesar el archivo:", error);
+                setError(msg);
+                toast.error(msg);
+            }
         } finally {
             setIsUploading(false);
         }
