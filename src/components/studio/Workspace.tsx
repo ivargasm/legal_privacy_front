@@ -13,7 +13,6 @@ import {
     User,
     MapPin,
     FileDigit,
-    ShieldOff,
     List,
     Trash2,
     X,
@@ -119,8 +118,6 @@ export default function Workspace() {
         text: '',
     });
 
-    if (!file) return null;
-
     // Calcular estadísticas de cobertura
     const activeEntities = useMemo(() => entities.filter((e) => !e.isBlacklisted), [entities]);
     const approvedEntities = useMemo(() => activeEntities.filter((e) => e.isApproved), [activeEntities]);
@@ -145,6 +142,8 @@ export default function Workspace() {
 
         return groups;
     }, [entities]);
+
+    if (!file) return null;
 
     const handleOpenBlacklist = async () => {
         setShowBlacklist(true);

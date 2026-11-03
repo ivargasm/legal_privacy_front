@@ -51,6 +51,8 @@ export interface PublicLawItem {
     id: number;
     title: string;
     source?: string | null;
+    scope?: 'PUBLIC' | 'ORGANIZATION';
+    organization_id?: number | null;
     created_at?: string | null;
     chunks_count: number;
     embedding_model: string;
@@ -59,6 +61,7 @@ export interface PublicLawItem {
     is_structured?: boolean;
     fts_ready?: boolean;
     needs_reindex: boolean;
+    can_manage?: boolean;
 }
 
 export interface PublicLawsResponse {
@@ -68,12 +71,21 @@ export interface PublicLawsResponse {
     ollama_pull_model?: string | null;
     chunking_strategy_active?: string;
     can_manage?: boolean;
+    can_manage_public?: boolean;
+    can_manage_firm?: boolean;
+    current_org_id?: number;
+    current_org_name?: string;
+    current_user_role?: string;
     laws: PublicLawItem[];
     outdated_count: number;
 }
 
-export async function getPublicLaws(): Promise<PublicLawsResponse> {
-    const res = await fetch(`${API_URL}/api/v1/library/laws`, {
+export async function getPublicLaws(scope?: 'PUBLIC' | 'ORGANIZATION' | 'ALL'): Promise<PublicLawsResponse> {
+    const url = new URL(`${API_URL}/api/v1/library/laws`);
+    if (scope) {
+        url.searchParams.set('scope', scope);
+    }
+    const res = await fetch(url.toString(), {
         method: 'GET',
         credentials: 'include',
     });
@@ -102,18 +114,34 @@ export async function reindexPublicLaws(documentId?: number) {
     return res.json();
 }
 
-export async function uploadPublicLaw(file: File) {
+export async function uploadPublicLaw(file: File, scope: 'PUBLIC' | 'ORGANIZATION' = 'PUBLIC') {
     const formData = new FormData();
     formData.append('file', file);
 
-    const res = await fetch(`${API_URL}/api/v1/library/upload_law`, {
+    const url = new URL(`${API_URL}/api/v1/library/upload_law`);
+    url.searchParams.set('scope', scope);
+
+    const res = await fetch(url.toString(), {
         method: 'POST',
         credentials: 'include',
         body: formData,
     });
 
     if (!res.ok) {
-        await throwHandledApiError(res, 'Error al subir la ley');
+        await throwHandledApiError(res, 'Error al subir el documento a la biblioteca');
+    }
+
+    return res.json();
+}
+
+export async function deletePublicLaw(documentId: number): Promise<{ message: string }> {
+    const res = await fetch(`${API_URL}/api/v1/library/laws/${documentId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+    });
+
+    if (!res.ok) {
+        await throwHandledApiError(res, 'Error al eliminar documento del acervo');
     }
 
     return res.json();

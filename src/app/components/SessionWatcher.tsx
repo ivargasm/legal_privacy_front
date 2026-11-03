@@ -45,7 +45,7 @@ export default function SessionWatcher() {
         checkExpiration();
 
         return () => clearInterval(interval);
-    }, [userAuth, user?.exp, logout]);
+    }, [userAuth, user, logout]);
 
     const handleRenew = async () => {
         setIsRenewing(true);

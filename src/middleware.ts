@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const PROTECTED_PREFIXES = ['/studio', '/library', '/profile'];
+const PROTECTED_PREFIXES = ['/studio', '/library', '/profile', '/organization'];
 const AUTH_PAGES = ['/auth/login', '/auth/register'];
 
 function sharesCookieSite(frontendHost: string): boolean {
@@ -89,5 +89,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/studio/:path*', '/library/:path*', '/profile/:path*', '/auth/login', '/auth/register'],
+    matcher: ['/studio/:path*', '/library/:path*', '/profile/:path*', '/organization/:path*', '/auth/login', '/auth/register'],
 };

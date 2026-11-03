@@ -5,7 +5,6 @@ import {
     FileText,
     Shield,
     Lock,
-    Cpu,
     Database,
     ShieldCheck,
     CheckCircle2,
@@ -44,10 +43,11 @@ export default function Uploader() {
             const data = await analyzeDocument(file);
             setAnalysisResult(data.extracted_text, data.entities);
             toast.success("Documento analizado con éxito.");
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            setError(error.message);
-            toast.error(error.message || "Error al procesar el archivo.");
+            const msg = error instanceof Error ? error.message : "Error al procesar el archivo.";
+            setError(msg);
+            toast.error(msg);
         } finally {
             setIsUploading(false);
         }
@@ -78,9 +78,10 @@ export default function Uploader() {
             const blob = await response.blob();
             const sampleFile = new File([blob], 'Contrato_Arrendamiento_Muestra.pdf', { type: 'application/pdf' });
             await handleFile(sampleFile);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error(error);
-            toast.error(error.message || "Error al cargar contrato de prueba.");
+            const msg = error instanceof Error ? error.message : "Error al cargar contrato de prueba.";
+            toast.error(msg);
             setIsUploading(false);
         }
     };

@@ -37,11 +37,17 @@ export const logout = async (url: string) => {
     }
 };
 
-export async function register(username: string, email: string, password: string, url: string) {
+export async function register(
+    username: string,
+    email: string,
+    password: string,
+    url: string,
+    invitation_token?: string
+) {
     const res = await fetch(`${url}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ username, email, password, invitation_token }),
     });
 
     if (res.status === 429) {

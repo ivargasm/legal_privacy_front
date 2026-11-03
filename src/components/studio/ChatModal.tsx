@@ -2,12 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
     X,
     Send,
-    ShieldCheck,
     Loader2,
     Bug,
-    FileText,
-    ArrowUpRight,
-    ArrowDownLeft,
     Lock,
     Sparkles,
     Scale,

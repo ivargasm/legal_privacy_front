@@ -11,7 +11,7 @@ interface AuthState {
     userAuth: boolean;
     isLoading: boolean;
     userValid: () => Promise<void>;
-    registerUser: (username: string, email: string, password: string) => Promise<unknown>;
+    registerUser: (username: string, email: string, password: string, invitation_token?: string) => Promise<unknown>;
     renewSession: () => Promise<boolean>;
 }
 
@@ -60,8 +60,8 @@ export const useAuthStore = create<AuthState>((set) => ({
             }
         }
     },
-    registerUser: async (username, email, password) => {
-        const data = await register(username, email, password, useAuthStore.getState().url);
+    registerUser: async (username, email, password, invitation_token) => {
+        const data = await register(username, email, password, useAuthStore.getState().url, invitation_token);
         return data;
     },
     renewSession: async () => {
