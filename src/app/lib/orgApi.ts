@@ -226,3 +226,105 @@ export async function acceptInvitation(token: string): Promise<{
     }
     return res.json();
 }
+
+
+export interface AuditLogItem {
+    id: number;
+    organization_id: number;
+    user_id: number;
+    username: string;
+    email: string;
+    action: string;
+    target_name?: string | null;
+    entity_text?: string | null;
+    scope?: string | null;
+    details?: Record<string, unknown> | null;
+    created_at: string;
+}
+
+export interface AuditLogsResponse {
+    items: AuditLogItem[];
+    total: number;
+    limit: number;
+    offset: number;
+}
+
+export interface AuditMetricsResponse {
+    total_docs_analyzed: number;
+    month_docs_analyzed: number;
+    total_exports: number;
+    total_pii_shielded: number;
+    lawyer_activity: Array<{
+        username: string;
+        email: string;
+        actions_count: number;
+    }>;
+    zero_retention_verified: boolean;
+}
+
+export async function fetchAuditLogs(
+    orgId: number,
+    params?: {
+        limit?: number;
+        offset?: number;
+        action?: string;
+        user_id?: number;
+        start_date?: string;
+        end_date?: string;
+    }
+): Promise<AuditLogsResponse> {
+    const query = new URLSearchParams();
+    if (params?.limit) query.append('limit', String(params.limit));
+    if (params?.offset) query.append('offset', String(params.offset));
+    if (params?.action && params.action !== 'ALL') query.append('action', params.action);
+    if (params?.user_id) query.append('user_id', String(params.user_id));
+    if (params?.start_date) query.append('start_date', params.start_date);
+    if (params?.end_date) query.append('end_date', params.end_date);
+
+    const qs = query.toString();
+    const url = `${API_URL}/api/v1/organizations/${orgId}/audit-logs${qs ? `?${qs}` : ''}`;
+    const res = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+        headers: getOrgHeaders(orgId),
+    });
+    if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.detail || "Error al cargar bitácora de auditoría");
+    }
+    return res.json();
+}
+
+export async function fetchAuditMetrics(orgId: number): Promise<AuditMetricsResponse> {
+    const res = await fetch(`${API_URL}/api/v1/organizations/${orgId}/audit-logs/metrics`, {
+        method: "GET",
+        credentials: "include",
+        headers: getOrgHeaders(orgId),
+    });
+    if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.detail || "Error al cargar métricas de auditoría");
+    }
+    return res.json();
+}
+
+export async function downloadAuditLogsCsv(orgId: number, filename?: string): Promise<void> {
+    const res = await fetch(`${API_URL}/api/v1/organizations/${orgId}/audit-logs/export`, {
+        method: "GET",
+        credentials: "include",
+        headers: getOrgHeaders(orgId),
+    });
+    if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.detail || "Error al descargar bitácora CSV");
+    }
+    const blob = await res.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = filename || `bitacora_auditoria_org_${orgId}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(downloadUrl);
+}

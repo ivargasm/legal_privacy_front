@@ -52,14 +52,15 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ConfirmModal } from '@/components/ui/confirm-modal';
+import AuditLogView from '@/components/organization/AuditLogView';
 import { toast } from 'sonner';
 
 export default function OrganizationPage() {
     const { activeOrg, loadOrganizations } = useOrgStore();
     const { user } = useAuthStore();
 
-    // Active tab: 'team' or 'billing'
-    const [activeTab, setActiveTab] = useState<'team' | 'billing'>('team');
+    // Active tab: 'team' | 'billing' | 'audit'
+    const [activeTab, setActiveTab] = useState<'team' | 'billing' | 'audit'>('team');
 
     // Team state
     const [members, setMembers] = useState<Member[]>([]);
@@ -148,6 +149,8 @@ export default function OrganizationPage() {
             const params = new URLSearchParams(window.location.search);
             if (params.get('tab') === 'billing') {
                 setActiveTab('billing');
+            } else if (params.get('tab') === 'audit') {
+                setActiveTab('audit');
             }
             if (params.get('billing') === 'success') {
                 toast.success('¡Suscripción actualizada exitosamente! Gracias por confiar en Legal Privacy.');
@@ -537,6 +540,27 @@ export default function OrganizationPage() {
                                 </Badge>
                             )}
                         </button>
+
+                        {canManageMembers && (
+                            <button
+                                type="button"
+                                onClick={() => setActiveTab('audit')}
+                                className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all ${
+                                    activeTab === 'audit'
+                                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs border border-slate-200/80 dark:border-slate-800 font-semibold'
+                                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-900/40'
+                                }`}
+                            >
+                                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                                <span>Bitácora y Cumplimiento</span>
+                                <Badge
+                                    variant="outline"
+                                    className="text-[10px] px-1.5 py-0.2 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 font-mono"
+                                >
+                                    Auditoría
+                                </Badge>
+                            </button>
+                        )}
                     </div>
 
                     {/* TAB 1: MIEMBROS Y DESPACHO */}
@@ -1433,6 +1457,17 @@ export default function OrganizationPage() {
                             </div>
                         </div>
                         )
+                    )}
+
+                    {/* TAB 3: BITÁCORA Y CUMPLIMIENTO ZERO-TRUST (FASE 9) */}
+                    {activeTab === 'audit' && activeOrg && (
+                        <div className="animate-in fade-in duration-200">
+                            <AuditLogView
+                                orgId={activeOrg.id}
+                                orgSlug={activeOrg.slug}
+                                isOwnerOrAdmin={canManageMembers}
+                            />
+                        </div>
                     )}
 
                     {/* Modales Compartidos */}
