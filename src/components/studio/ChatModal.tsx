@@ -48,17 +48,17 @@ const MODE_BADGE_META: Record<
 > = {
     review: {
         label: '✨ Dictamen Integral y Mejoras',
-        className: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/40 dark:text-violet-300 dark:border-violet-800',
+        className: 'bg-accent/30 text-accent-foreground border border-accent/40',
         exportTitle: 'Dictamen Jurídico y Propuesta de Mejoras',
     },
     draft: {
         label: '✍️ Redacción Complementaria',
-        className: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800',
+        className: 'bg-primary/10 text-primary border border-primary/20',
         exportTitle: 'Propuesta de Cláusulas y Redacción Complementaria',
     },
     compliance: {
         label: '🏛️ Auditoría contra Leyes Públicas',
-        className: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800',
+        className: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20',
         exportTitle: 'Auditoría de Cumplimiento Normativo',
     },
 };
@@ -276,17 +276,17 @@ export default function ChatModal({
             {/* Slide-Over Drawer Lateral (480px) */}
             <aside
                 aria-label="Copiloto Jurídico"
-                className="fixed inset-y-0 right-0 z-50 w-full sm:w-[480px] bg-white dark:bg-slate-900 shadow-2xl border-l border-slate-200/80 dark:border-slate-800 flex flex-col pointer-events-auto animate-in slide-in-from-right duration-200"
+                className="fixed inset-y-0 right-0 z-50 w-full sm:w-[480px] bg-card shadow-2xl border-l border-border flex flex-col pointer-events-auto animate-in slide-in-from-right duration-200"
             >
                 {/* Header del Copiloto */}
-                <div className="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/60 dark:bg-slate-900/60 shrink-0">
+                <div className="px-5 py-3.5 border-b border-border flex items-center justify-between bg-card shrink-0">
                     <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shadow-2xs">
+                        <div className="w-7 h-7 rounded-lg bg-muted text-primary flex items-center justify-center shadow-xs border border-border">
                             <Bot className="w-4 h-4" />
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
-                                <h3 className="font-semibold text-xs text-slate-900 dark:text-white">
+                                <h3 className="font-semibold text-xs text-foreground">
                                     Copiloto Jurídico
                                 </h3>
                                 <span className="inline-flex items-center gap-1 text-[10px] text-emerald-600 font-medium">
@@ -294,8 +294,8 @@ export default function ChatModal({
                                     Local
                                 </span>
                             </div>
-                            <p className="text-[10px] text-slate-500">
-                                Zero-Trust · Datos reales nunca salen de tu equipo
+                            <p className="text-[10px] text-muted-foreground">
+                                Zero-Trust · Datos reales nunca salen de tu servidor
                             </p>
                         </div>
                     </div>
@@ -304,10 +304,10 @@ export default function ChatModal({
                         <button
                             type="button"
                             onClick={() => setShowDebug(!showDebug)}
-                            className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors ${
+                            className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors cursor-pointer ${
                                 showDebug
-                                    ? 'bg-amber-100 text-amber-800 border border-amber-300'
-                                    : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                    ? 'bg-amber-100 text-amber-900 border border-amber-300 dark:bg-amber-950/60 dark:text-amber-200 dark:border-amber-800'
+                                    : 'text-muted-foreground hover:bg-muted'
                             }`}
                         >
                             <Bug size={13} />
@@ -317,7 +317,7 @@ export default function ChatModal({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                            className="text-muted-foreground hover:text-foreground p-1.5 hover:bg-muted rounded-lg transition-colors cursor-pointer"
                         >
                             <X size={16} />
                         </button>
@@ -326,12 +326,12 @@ export default function ChatModal({
 
                 {/* Barra de Postura de Representación + Acciones Rápidas */}
                 {!isMasking && sessionId && (
-                    <div className="px-5 py-2.5 border-b border-slate-100 dark:border-slate-800 bg-violet-50/40 dark:bg-violet-950/20 shrink-0 space-y-2">
+                    <div className="px-5 py-2.5 border-b border-border bg-muted/30 shrink-0 space-y-2">
                         {/* Selector de Postura */}
                         <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                                <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 shrink-0 uppercase tracking-wider flex items-center gap-1">
-                                    <Scale className="w-3 h-3 text-indigo-600" />
+                                <span className="text-[11px] font-semibold text-foreground shrink-0 uppercase tracking-wider flex items-center gap-1">
+                                    <Scale className="w-3 h-3 text-primary" />
                                     Posición:
                                 </span>
                                 <div className="relative flex-1 min-w-0">
@@ -339,7 +339,7 @@ export default function ChatModal({
                                         value={selectedPartyToken}
                                         onChange={e => setSelectedPartyToken(e.target.value)}
                                         disabled={isLoading}
-                                        className="w-full text-xs rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 py-1 pl-2 pr-6 text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:ring-1 focus:ring-indigo-500 truncate appearance-none"
+                                        className="w-full text-xs rounded-md border border-border bg-background py-1 pl-2 pr-6 text-foreground font-medium focus:outline-none focus:ring-1 focus:ring-primary truncate appearance-none cursor-pointer"
                                     >
                                         <option value="">⚖️ Neutral / Equilibrada</option>
                                         {parties.map(p => (
@@ -348,7 +348,7 @@ export default function ChatModal({
                                             </option>
                                         ))}
                                     </select>
-                                    <ChevronDown className="w-3 h-3 text-slate-400 absolute right-2 top-2 pointer-events-none" />
+                                    <ChevronDown className="w-3 h-3 text-muted-foreground absolute right-2 top-2 pointer-events-none" />
                                 </div>
                             </div>
                             {selectedPartyToken && (
@@ -365,25 +365,25 @@ export default function ChatModal({
                                 type="button"
                                 disabled={isLoading}
                                 onClick={() => handleQuickAction('review')}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium bg-white dark:bg-slate-800 hover:bg-violet-50 text-violet-800 dark:text-violet-300 border border-violet-200/80 dark:border-violet-800/60 shadow-2xs shrink-0 transition-colors disabled:opacity-50"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium bg-card hover:bg-muted text-foreground border border-border shadow-xs shrink-0 transition-colors disabled:opacity-50 cursor-pointer"
                             >
-                                <Sparkles size={11} className="text-violet-600" />
+                                <Sparkles size={11} className="text-accent-foreground" />
                                 <span>Sugerir Mejoras</span>
                             </button>
                             <button
                                 type="button"
                                 disabled={isLoading}
                                 onClick={() => handleQuickAction('draft')}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium bg-white dark:bg-slate-800 hover:bg-indigo-50 text-indigo-800 dark:text-indigo-300 border border-indigo-200/80 dark:border-indigo-800/60 shadow-2xs shrink-0 transition-colors disabled:opacity-50"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium bg-card hover:bg-muted text-foreground border border-border shadow-xs shrink-0 transition-colors disabled:opacity-50 cursor-pointer"
                             >
-                                <PenTool size={11} className="text-indigo-600" />
+                                <PenTool size={11} className="text-primary" />
                                 <span>Redactar Cláusulas</span>
                             </button>
                             <button
                                 type="button"
                                 disabled={isLoading}
                                 onClick={() => handleQuickAction('compliance')}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium bg-white dark:bg-slate-800 hover:bg-emerald-50 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60 shadow-2xs shrink-0 transition-colors disabled:opacity-50"
+                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium bg-card hover:bg-muted text-foreground border border-border shadow-xs shrink-0 transition-colors disabled:opacity-50 cursor-pointer"
                             >
                                 <BookOpenCheck size={11} className="text-emerald-600" />
                                 <span>Auditar Leyes</span>
@@ -393,17 +393,17 @@ export default function ChatModal({
                 )}
 
                 {/* Área de Conversación / Debug */}
-                <div className="flex-1 min-h-0 flex flex-col relative overflow-hidden bg-slate-50/30 dark:bg-slate-900/40">
+                <div className="flex-1 min-h-0 flex flex-col relative overflow-hidden bg-background">
                     {/* Debug Panel Inspector si está abierto */}
                     {showDebug && (
-                        <div className="border-b border-amber-200 bg-amber-50/90 dark:bg-amber-950/30 p-2.5 text-xs font-mono max-h-48 overflow-y-auto space-y-2 shrink-0">
-                            <div className="flex items-center justify-between text-[10px] font-sans font-bold uppercase text-amber-900 dark:text-amber-300">
+                        <div className="border-b border-amber-300 dark:border-amber-800 bg-amber-50/90 dark:bg-amber-950/40 p-2.5 text-xs font-mono max-h-48 overflow-y-auto space-y-2 shrink-0">
+                            <div className="flex items-center justify-between text-[10px] font-sans font-bold uppercase text-amber-900 dark:text-amber-200">
                                 <span>Auditoría de Tráfico Seguro</span>
                                 <div className="flex gap-2">
                                     <button
                                         type="button"
                                         onClick={() => setDebugTab('traffic')}
-                                        className={`hover:underline ${debugTab === 'traffic' ? 'font-bold underline' : ''}`}
+                                        className={`hover:underline cursor-pointer ${debugTab === 'traffic' ? 'font-bold underline' : ''}`}
                                     >
                                         Tráfico ({auditedMessages.length})
                                     </button>
@@ -411,7 +411,7 @@ export default function ChatModal({
                                     <button
                                         type="button"
                                         onClick={() => setDebugTab('doc')}
-                                        className={`hover:underline ${debugTab === 'doc' ? 'font-bold underline' : ''}`}
+                                        className={`hover:underline cursor-pointer ${debugTab === 'doc' ? 'font-bold underline' : ''}`}
                                     >
                                         Doc Enmascarado
                                     </button>
@@ -420,11 +420,11 @@ export default function ChatModal({
 
                             {debugTab === 'traffic' ? (
                                 auditedMessages.length === 0 ? (
-                                    <p className="text-[11px] text-amber-700">Envía un mensaje para auditar los tokens anónimos en tránsito.</p>
+                                    <p className="text-[11px] text-amber-700 dark:text-amber-300">Envía un mensaje para auditar los tokens anónimos en tránsito.</p>
                                 ) : (
                                     auditedMessages.map(msg => (
-                                        <div key={`dbg-${msg.id}`} className="bg-white/80 dark:bg-slate-900/80 p-2 rounded border border-amber-200 text-[10px] break-words">
-                                            <span className="font-sans font-semibold text-amber-800 block">
+                                        <div key={`dbg-${msg.id}`} className="bg-card p-2 rounded border border-border text-[10px] break-words text-foreground">
+                                            <span className="font-sans font-semibold text-accent-foreground block">
                                                 {msg.role === 'user' ? 'Enviado a IA:' : 'Respuesta Cruda:'}
                                             </span>
                                             {msg.maskedContent}
@@ -432,7 +432,7 @@ export default function ChatModal({
                                     ))
                                 )
                             ) : (
-                                <div className="text-[10px] text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
+                                <div className="text-[10px] text-foreground whitespace-pre-wrap">
                                     {maskedText || 'Esperando...'}
                                 </div>
                             )}
@@ -442,8 +442,8 @@ export default function ChatModal({
                     {/* Stream de Mensajes */}
                     <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3.5 flex flex-col">
                         {isMasking ? (
-                            <div className="flex flex-col items-center justify-center h-full text-slate-500 space-y-3 text-center p-4">
-                                <Loader2 className="animate-spin text-indigo-500" size={28} />
+                            <div className="flex flex-col items-center justify-center h-full text-muted-foreground space-y-3 text-center p-4">
+                                <Loader2 className="animate-spin text-primary" size={28} />
                                 <p className="text-xs font-medium">Anonimizando documento y preparando el entorno seguro...</p>
                             </div>
                         ) : (
@@ -476,8 +476,8 @@ export default function ChatModal({
                                         <div
                                             className={`max-w-[92%] p-3.5 rounded-xl text-xs leading-relaxed ${
                                                 msg.role === 'user'
-                                                    ? 'bg-indigo-600 text-white rounded-tr-none shadow-xs'
-                                                    : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-700 shadow-2xs rounded-tl-none'
+                                                    ? 'bg-primary text-primary-foreground font-medium rounded-tr-none shadow-xs'
+                                                    : 'bg-card text-foreground border border-border shadow-xs rounded-tl-none'
                                             }`}
                                         >
                                             <p className="whitespace-pre-wrap">{msg.content}</p>
@@ -489,7 +489,7 @@ export default function ChatModal({
                                                 <button
                                                     type="button"
                                                     onClick={() => handleCopyMessage(msg)}
-                                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 bg-white dark:bg-slate-800 hover:bg-slate-100 border border-slate-200/80 dark:border-slate-700 transition-colors"
+                                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium text-muted-foreground hover:text-foreground bg-card hover:bg-muted border border-border transition-colors cursor-pointer"
                                                 >
                                                     {copiedId === msg.id ? (
                                                         <>
@@ -508,12 +508,12 @@ export default function ChatModal({
                                                     type="button"
                                                     disabled={exportingId === msg.id}
                                                     onClick={() => handleExportDocx(msg)}
-                                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50/80 dark:bg-indigo-950/50 hover:bg-indigo-100 border border-indigo-200/80 dark:border-indigo-800 transition-colors disabled:opacity-50"
+                                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium text-foreground bg-card hover:bg-muted border border-border transition-colors disabled:opacity-50 cursor-pointer"
                                                 >
                                                     {exportingId === msg.id ? (
                                                         <Loader2 size={11} className="animate-spin" />
                                                     ) : (
-                                                        <FileDown size={11} />
+                                                        <FileDown size={11} className="text-primary" />
                                                     )}
                                                     <span>Descargar .docx</span>
                                                 </button>
@@ -526,10 +526,10 @@ export default function ChatModal({
 
                         {isLoading && (
                             <div className="flex justify-start">
-                                <div className="bg-white dark:bg-slate-800 text-slate-400 border border-slate-200/80 dark:border-slate-700 rounded-xl p-3 flex items-center space-x-2">
-                                    <div className="w-1.5 h-1.5 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                    <div className="w-1.5 h-1.5 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                    <div className="w-1.5 h-1.5 bg-indigo-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                <div className="bg-card text-muted-foreground border border-border rounded-xl p-3 flex items-center space-x-2">
+                                    <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                    <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                    <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                                 </div>
                             </div>
                         )}
@@ -538,33 +538,33 @@ export default function ChatModal({
                 </div>
 
                 {/* Input Flotante Inferior + Aviso Cero Telemetría */}
-                <div className="p-3.5 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 space-y-2">
+                <div className="p-3.5 border-t border-border bg-card shrink-0 space-y-2">
                     <form onSubmit={handleSend} className="relative flex items-center">
                         <input
                             type="text"
                             value={input}
                             onChange={e => setInput(e.target.value)}
                             placeholder="Propón una cláusula o pregunta sobre el contrato..."
-                            className="w-full pl-3 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 transition-all"
+                            className="w-full pl-3 pr-10 py-2.5 rounded-lg border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary text-xs text-foreground placeholder-muted-foreground transition-all"
                             disabled={isLoading || isMasking || !sessionId}
                         />
                         <button
                             type="submit"
                             disabled={!input.trim() || isLoading || isMasking || !sessionId}
-                            className="absolute right-1.5 p-1.5 text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-200 dark:disabled:bg-slate-700 disabled:text-slate-400 rounded-lg transition-colors"
+                            className="absolute right-1.5 p-1.5 text-primary-foreground bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground rounded-md transition-colors cursor-pointer"
                         >
                             <Send size={14} />
                         </button>
                     </form>
 
-                    <div className="flex items-center justify-between text-[10px] text-slate-400 px-1 font-mono">
-                        <span className="flex items-center gap-1 text-slate-500">
+                    <div className="flex items-center justify-between text-[10px] text-muted-foreground px-1 font-mono">
+                        <span className="flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                            Llama 3 / Qwen Local (8B-Q4)
+                            LLM Seguro · Texto 100% Enmascarado
                         </span>
                         <span className="flex items-center gap-1">
-                            <Lock size={10} className="text-slate-400" />
-                            Cero telemetría externa
+                            <Lock size={10} className="text-muted-foreground" />
+                            Cero fuga de PII
                         </span>
                     </div>
                 </div>

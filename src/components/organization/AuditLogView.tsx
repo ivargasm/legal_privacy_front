@@ -185,10 +185,10 @@ export default function AuditLogView({ orgId, orgSlug, isOwnerOrAdmin }: AuditLo
 
     if (!isOwnerOrAdmin) {
         return (
-            <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
-                <Lock className="w-8 h-8 text-slate-400 mx-auto" />
-                <h3 className="font-semibold text-slate-900 dark:text-white">Acceso Restringido</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+            <div className="p-8 text-center bg-card rounded-xl border border-border space-y-3">
+                <Lock className="w-8 h-8 text-muted-foreground mx-auto" />
+                <h3 className="font-semibold text-foreground">Acceso Restringido</h3>
+                <p className="text-xs text-muted-foreground max-w-md mx-auto">
                     La bitácora de auditoría y reportes de cumplimiento son exclusivos para Socios Directores y Administradores del despacho.
                 </p>
             </div>
@@ -197,82 +197,82 @@ export default function AuditLogView({ orgId, orgSlug, isOwnerOrAdmin }: AuditLo
 
     return (
         <div className="space-y-6">
-            {/* Top KPI Cards */}
+            {/* Top KPI Cards (LexControl Style) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-2">
-                    <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-medium">
+                <div className="p-5 rounded-xl bg-card border border-border shadow-sm hover:border-primary/50 hover:shadow-md transition-all group space-y-2">
+                    <div className="flex items-center justify-between text-muted-foreground text-xs font-medium">
                         <span>PII Blindada en Servidor</span>
-                        <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-muted text-emerald-600 flex items-center justify-center">
                             <ShieldCheck className="w-4 h-4" />
                         </div>
                     </div>
-                    <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                    <div className="text-2xl font-bold text-foreground">
                         {metrics?.total_pii_shielded ?? 0}
                     </div>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    <p className="text-[11px] text-muted-foreground">
                         Datos confidenciales anonimizados localmente
                     </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-2">
-                    <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-medium">
+                <div className="p-5 rounded-xl bg-card border border-border shadow-sm hover:border-primary/50 hover:shadow-md transition-all group space-y-2">
+                    <div className="flex items-center justify-between text-muted-foreground text-xs font-medium">
                         <span>Análisis de Contratos</span>
-                        <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-muted text-primary flex items-center justify-center">
                             <FileText className="w-4 h-4" />
                         </div>
                     </div>
-                    <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                    <div className="text-2xl font-bold text-foreground">
                         {metrics?.month_docs_analyzed ?? 0}{' '}
-                        <span className="text-xs font-normal text-slate-400">
+                        <span className="text-xs font-normal text-muted-foreground">
                             / {metrics?.total_docs_analyzed ?? 0} total
                         </span>
                     </div>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    <p className="text-[11px] text-muted-foreground">
                         Expedientes procesados en el ciclo actual
                     </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-2xs space-y-2">
-                    <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-medium">
+                <div className="p-5 rounded-xl bg-card border border-border shadow-sm hover:border-primary/50 hover:shadow-md transition-all group space-y-2">
+                    <div className="flex items-center justify-between text-muted-foreground text-xs font-medium">
                         <span>Dictámenes Exportados</span>
-                        <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-600 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-lg bg-muted text-accent-foreground flex items-center justify-center">
                             <Download className="w-4 h-4" />
                         </div>
                     </div>
-                    <div className="text-2xl font-bold text-slate-900 dark:text-white">
+                    <div className="text-2xl font-bold text-foreground">
                         {metrics?.total_exports ?? 0}
                     </div>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    <p className="text-[11px] text-muted-foreground">
                         Documentos Word (.docx) y testados descargados
                     </p>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/60 shadow-2xs space-y-2">
-                    <div className="flex items-center justify-between text-emerald-800 dark:text-emerald-300 text-xs font-medium">
+                <div className="p-5 rounded-xl bg-card border border-border shadow-sm hover:border-primary/50 hover:shadow-md transition-all group space-y-2">
+                    <div className="flex items-center justify-between text-muted-foreground text-xs font-medium">
                         <span>Gobernanza Zero Data</span>
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                     </div>
-                    <div className="text-sm font-semibold text-emerald-900 dark:text-emerald-200 pt-1">
+                    <div className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 pt-1">
                         Cero Retención Externa
                     </div>
-                    <p className="text-[11px] text-emerald-700 dark:text-emerald-400 leading-relaxed">
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
                         0 bytes de contratos crudos almacenados en la base de datos central.
                     </p>
                 </div>
             </div>
 
             {/* Header / Filter Toolbar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-card rounded-xl border border-border shadow-sm">
                 <div className="flex items-center gap-2 flex-wrap">
-                    <Filter className="w-4 h-4 text-slate-400 mr-1" />
-                    <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">Filtrar por:</span>
+                    <Filter className="w-4 h-4 text-muted-foreground mr-1" />
+                    <span className="text-xs text-muted-foreground font-medium">Filtrar por:</span>
                     <select
                         value={actionFilter}
                         onChange={(e) => {
                             setActionFilter(e.target.value);
                             setPage(0);
                         }}
-                        className="text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2.5 py-1.5 text-slate-800 dark:text-slate-200 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+                        className="text-xs rounded-lg border border-border bg-background px-2.5 py-1.5 text-foreground focus:outline-hidden focus:ring-1 focus:ring-primary cursor-pointer"
                     >
                         <option value="ALL">Todas las acciones ({totalLogs})</option>
                         <option value="DOC_ANALYZED">Análisis de Documentos</option>
@@ -291,7 +291,7 @@ export default function AuditLogView({ orgId, orgSlug, isOwnerOrAdmin }: AuditLo
                         size="sm"
                         onClick={loadData}
                         disabled={isLoading}
-                        className="text-xs h-8 text-slate-600 dark:text-slate-400"
+                        className="text-xs h-8 text-muted-foreground hover:text-foreground cursor-pointer"
                     >
                         <RefreshCw className={`w-3.5 h-3.5 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
                         <span>Actualizar</span>
@@ -304,7 +304,7 @@ export default function AuditLogView({ orgId, orgSlug, isOwnerOrAdmin }: AuditLo
                         size="sm"
                         onClick={handleDownloadCsv}
                         disabled={isDownloadingCsv || logs.length === 0}
-                        className="text-xs h-8 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 gap-1.5 shadow-2xs"
+                        className="text-xs h-8 border-border text-foreground hover:bg-muted gap-1.5 shadow-xs cursor-pointer"
                     >
                         <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
                         <span>{isDownloadingCsv ? 'Descargando...' : 'Descargar Bitácora (CSV)'}</span>
@@ -313,10 +313,10 @@ export default function AuditLogView({ orgId, orgSlug, isOwnerOrAdmin }: AuditLo
             </div>
 
             {/* Table */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-2xs">
+            <div className="bg-card rounded-xl border border-border overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs text-slate-600 dark:text-slate-400">
-                        <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-700 dark:text-slate-300 border-b border-slate-200/80 dark:border-slate-800 font-medium">
+                    <table className="w-full text-left text-xs text-muted-foreground">
+                        <thead className="bg-muted/60 text-foreground border-b border-border font-medium">
                             <tr>
                                 <th className="px-4 py-3.5">Fecha y Hora</th>
                                 <th className="px-4 py-3.5">Abogado</th>
@@ -325,42 +325,42 @@ export default function AuditLogView({ orgId, orgSlug, isOwnerOrAdmin }: AuditLo
                                 <th className="px-4 py-3.5">Detalles de Privacidad</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
+                        <tbody className="divide-y divide-border/60">
                             {isLoading && logs.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="py-12 text-center text-slate-400">
-                                        <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-indigo-500" />
+                                    <td colSpan={5} className="py-12 text-center text-muted-foreground">
+                                        <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-primary" />
                                         <span>Cargando bitácora de auditoría...</span>
                                     </td>
                                 </tr>
                             ) : logs.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="py-12 text-center text-slate-400">
+                                    <td colSpan={5} className="py-12 text-center text-muted-foreground">
                                         <Clock className="w-6 h-6 mx-auto mb-2 opacity-50" />
                                         <span>No hay registros de auditoría para el filtro seleccionado.</span>
                                     </td>
                                 </tr>
                             ) : (
                                 logs.map((log) => (
-                                    <tr key={log.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/30 transition-colors">
-                                        <td className="px-4 py-3 font-mono text-[11px] text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                                    <tr key={log.id} className="hover:bg-muted/40 transition-colors">
+                                        <td className="px-4 py-3 font-mono text-[11px] text-muted-foreground whitespace-nowrap">
                                             {formatDate(log.created_at)}
                                         </td>
                                         <td className="px-4 py-3 whitespace-nowrap">
-                                            <div className="font-medium text-slate-900 dark:text-white">
+                                            <div className="font-medium text-foreground">
                                                 {log.username}
                                             </div>
-                                            <div className="text-[10px] text-slate-400">
+                                            <div className="text-[10px] text-muted-foreground">
                                                 {log.email}
                                             </div>
                                         </td>
                                         <td className="px-4 py-3 whitespace-nowrap">
                                             {getActionBadge(log.action)}
                                         </td>
-                                        <td className="px-4 py-3 font-medium text-slate-800 dark:text-slate-200 max-w-[200px] truncate">
+                                        <td className="px-4 py-3 font-medium text-foreground max-w-[200px] truncate">
                                             {log.target_name || log.entity_text || '—'}
                                         </td>
-                                        <td className="px-4 py-3 text-[11px] text-slate-500 dark:text-slate-400">
+                                        <td className="px-4 py-3 text-[11px] text-muted-foreground">
                                             {log.details ? (
                                                 <div className="flex items-center gap-1.5 flex-wrap">
                                                     {log.details.pii_detected !== undefined && (
@@ -369,22 +369,22 @@ export default function AuditLogView({ orgId, orgSlug, isOwnerOrAdmin }: AuditLo
                                                         </span>
                                                     )}
                                                     {Boolean(log.details.doc_kind) && (
-                                                        <span className="uppercase text-[9px] font-mono font-semibold px-1 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                                                        <span className="uppercase text-[9px] font-mono font-semibold px-1 py-0.5 rounded bg-muted text-foreground">
                                                             {String(log.details.doc_kind)}
                                                         </span>
                                                     )}
                                                     {Boolean(log.details.export_format) && (
-                                                        <span className="text-[10px] font-mono text-indigo-600 dark:text-indigo-400">
+                                                        <span className="text-[10px] font-mono text-primary font-semibold">
                                                             Formato {String(log.details.export_format)}
                                                         </span>
                                                     )}
                                                     {Boolean(log.details.new_role) && (
-                                                        <span className="text-[10px] font-medium text-blue-600">
+                                                        <span className="text-[10px] font-medium text-accent-foreground">
                                                             Nuevo rol: {String(log.details.new_role)}
                                                         </span>
                                                     )}
                                                     {Boolean(log.details.chunks_count) && (
-                                                        <span className="text-[10px] text-slate-500">
+                                                        <span className="text-[10px] text-muted-foreground">
                                                             {String(log.details.chunks_count)} fragmentos jurídicos
                                                         </span>
                                                     )}

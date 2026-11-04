@@ -6,7 +6,7 @@ import LibraryWorkspace from '@/components/library/LibraryWorkspace';
 export default function LibraryPage() {
     return (
         <ProtectedRoute>
-            <div className="w-full min-h-[calc(100vh-3.75rem)] mt-15 py-8 px-4 sm:px-6 bg-[#FAFAFA] dark:bg-slate-950 pb-16">
+            <div className="w-full min-h-[calc(100vh-3.75rem)] mt-15 py-8 px-4 sm:px-6 bg-background pb-16">
                 <div className="max-w-5xl mx-auto mb-8 text-center space-y-2">
                     <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 font-semibold">
                         ACERVO NORMATIVO Y DOCTRINA INTERNA

@@ -12,6 +12,7 @@ import {
     FolderLock,
     UploadCloud,
     SlidersHorizontal,
+    Cpu,
 } from 'lucide-react';
 import { useDocumentStore } from '@/app/store/documentStore';
 import { analyzeDocument, ApiError } from '@/app/lib/documentApi';
@@ -54,7 +55,6 @@ export default function Uploader() {
                 msg.toLowerCase().includes('cuota');
 
             if (isQuota) {
-                // No llamamos console.error para evitar el overlay de error de Next.js en entorno de desarrollo
                 setQuotaExceeded(true, msg);
             } else {
                 console.error("Error al procesar el archivo:", error);
@@ -102,20 +102,20 @@ export default function Uploader() {
     return (
         <div className="w-full max-w-5xl mx-auto space-y-8 animate-in fade-in duration-300">
             {/* Header / Workspace Identity */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-slate-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border">
                 <div className="space-y-1">
-                    <p className="text-[11px] font-mono uppercase tracking-wider text-slate-500 font-semibold">
-                        VILLARREAL ABOGADOS · DESPACHO PRINCIPAL
+                    <p className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
+                        SISTEMA FORENSE DE PRIVACIDAD · DESPACHO JURÍDICO
                     </p>
-                    <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
+                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
                         Espacio de Trabajo Jurídico
                     </h1>
-                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                         Auditoría local, redacción asistida y desidentificación de contratos sin fuga de datos confidenciales.
                     </p>
                 </div>
 
-                <div className="flex items-center gap-2 self-start sm:self-center px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800/60 shadow-2xs">
+                <div className="flex items-center gap-2 self-start sm:self-center px-3 py-1.5 rounded-full text-xs font-medium bg-muted text-foreground border border-border shadow-xs">
                     <ShieldCheck className="w-4 h-4 text-emerald-600" />
                     <span>Entorno de Aislamiento Activo (Zero Data Retention)</span>
                 </div>
@@ -123,10 +123,10 @@ export default function Uploader() {
 
             {/* Central Dropzone */}
             <div
-                className={`relative flex flex-col items-center justify-center p-8 sm:p-12 rounded-2xl border-2 border-dashed transition-all bg-white dark:bg-slate-900/80 shadow-2xs ${
+                className={`relative flex flex-col items-center justify-center p-8 sm:p-12 rounded-xl border-2 border-dashed transition-all bg-card shadow-sm ${
                     isDragging
-                        ? 'border-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/20 scale-[1.005]'
-                        : 'border-slate-200 dark:border-slate-800 hover:border-indigo-400/80 dark:hover:border-slate-700'
+                        ? 'border-primary bg-accent/20 scale-[1.005]'
+                        : 'border-border hover:border-primary/60 hover:shadow-md'
                 }`}
                 onDragOver={(e) => {
                     e.preventDefault();
@@ -137,26 +137,26 @@ export default function Uploader() {
             >
                 {/* Central Document + Padlock Icon */}
                 <div className="relative mb-5">
-                    <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-100 dark:border-indigo-900/60 shadow-xs">
+                    <div className="w-16 h-16 rounded-xl bg-muted text-primary flex items-center justify-center border border-border shadow-xs">
                         <FileText className="w-8 h-8" />
                     </div>
-                    <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-xs ring-2 ring-white dark:ring-slate-900">
+                    <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xs ring-2 ring-card">
                         <Lock className="w-3.5 h-3.5" />
                     </div>
                 </div>
 
-                <h3 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white mb-2">
+                <h3 className="text-lg sm:text-xl font-bold tracking-tight text-foreground mb-2">
                     Arrastra un contrato aquí o examina tus archivos
                 </h3>
 
                 <div className="flex items-center gap-2 mb-3">
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-medium text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-medium text-muted-foreground bg-muted border border-border">
                         Formatos admitidos: PDF, DOCX • Máx. 25 MB
                     </span>
                 </div>
 
-                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 text-center max-w-lg mb-6 leading-relaxed">
-                    Los datos se procesan en tu equipo antes de cualquier consulta con IA. Ningún documento viaja sin testar criptográficamente.
+                <p className="text-xs sm:text-sm text-muted-foreground text-center max-w-lg mb-6 leading-relaxed">
+                    Los datos se procesan en tu servidor antes de cualquier consulta con IA. Ningún documento viaja a modelos externos sin testar criptográficamente.
                 </p>
 
                 <input
@@ -174,7 +174,7 @@ export default function Uploader() {
                         type="button"
                         disabled={isUploading}
                         onClick={() => fileInputRef.current?.click()}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2.5 rounded-xl shadow-xs transition-all flex items-center gap-2"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-5 py-2.5 rounded-lg shadow-sm transition-all flex items-center gap-2 cursor-pointer"
                     >
                         <UploadCloud className="w-4 h-4" />
                         <span>{isUploading ? "Analizando..." : "Explorar archivos locales"}</span>
@@ -185,61 +185,71 @@ export default function Uploader() {
                         variant="outline"
                         disabled={isUploading}
                         onClick={handleLoadSample}
-                        className="border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium px-4 py-2.5 rounded-xl transition-all flex items-center gap-2"
+                        className="border-border text-foreground hover:bg-muted font-medium px-4 py-2.5 rounded-lg transition-all flex items-center gap-2 cursor-pointer"
                     >
-                        <Sparkles className="w-4 h-4 text-violet-600" />
+                        <Sparkles className="w-4 h-4 text-accent-foreground" />
                         <span>Cargar contrato de prueba</span>
                     </Button>
                 </div>
             </div>
 
-            {/* 3 Telemetry / Hardware Status Cards */}
+            {/* 3 Telemetry / Hardware Status Cards (LexControl StatsCard Style) */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Card 1: Rendimiento Criptográfico */}
-                <div className="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-3 shadow-2xs">
+                <div className="p-5 rounded-xl bg-card border border-border space-y-3 shadow-sm hover:border-primary/50 hover:shadow-md transition-all group">
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono font-semibold tracking-wider uppercase text-slate-500">
+                        <span className="text-[10px] font-mono font-semibold tracking-wider uppercase text-muted-foreground">
                             RENDIMIENTO CRIPTOGRÁFICO
                         </span>
                         <span className="w-2 h-2 rounded-full bg-emerald-500" />
                     </div>
-                    <div>
-                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white">
-                            Motor Local Cuantizado
-                        </h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                            Ejecución en memoria local. Cero telemetría externa.
-                        </p>
-                    </div>
-                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                        <div className="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400 mb-1">
-                            <span>Memoria Aislada</span>
-                            <span className="font-mono font-medium">3.8 GB / 16.0 GB</span>
+                    <div className="flex items-start gap-3">
+                        <div className="p-2.5 rounded-lg bg-muted text-primary shrink-0">
+                            <Cpu className="w-5 h-5" />
                         </div>
-                        <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                            <div className="h-full bg-indigo-600 rounded-full w-[24%]" />
+                        <div>
+                            <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                                Motor Local Cuantizado
+                            </h4>
+                            <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                                Detección de PII y filtro de falsos positivos ejecutado 100% en local.
+                            </p>
+                        </div>
+                    </div>
+                    <div className="pt-2 border-t border-border">
+                        <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1">
+                            <span>Memoria Aislada</span>
+                            <span className="font-mono font-medium text-foreground">Qwen 2.5:7b + Presidio</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-primary rounded-full w-[35%]" />
                         </div>
                     </div>
                 </div>
 
                 {/* Card 2: Bóveda Documental */}
-                <div className="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-3 shadow-2xs">
+                <div className="p-5 rounded-xl bg-card border border-border space-y-3 shadow-sm hover:border-primary/50 hover:shadow-md transition-all group">
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono font-semibold tracking-wider uppercase text-slate-500">
-                            BÓVEDA DOCUMENTAL
+                        <span className="text-[10px] font-mono font-semibold tracking-wider uppercase text-muted-foreground">
+                            BÓVEDA EFÍMERA
                         </span>
-                        <Database className="w-3.5 h-3.5 text-slate-400" />
+                        <Database className="w-3.5 h-3.5 text-muted-foreground" />
                     </div>
-                    <div>
-                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white">
-                            Índice Vectorial Local (Redis)
-                        </h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                            Fragmentos indexados bajo cifrado efímero en memoria (TTL deslizante).
-                        </p>
+                    <div className="flex items-start gap-3">
+                        <div className="p-2.5 rounded-lg bg-muted text-primary shrink-0">
+                            <Database className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                                Índice Vectorial (Redis)
+                            </h4>
+                            <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                                Fragmentos protegidos bajo cifrado efímero en memoria (TTL deslizante de 2h).
+                            </p>
+                        </div>
                     </div>
-                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px]">
-                        <span className="font-mono text-slate-500">Sha-256: 8f4e...9b12</span>
+                    <div className="pt-2 border-t border-border flex items-center justify-between text-[11px]">
+                        <span className="font-mono text-muted-foreground">Zero Data Retention</span>
                         <span className="inline-flex items-center gap-1 text-emerald-600 font-medium">
                             <CheckCircle2 className="w-3 h-3" /> Sincronizado
                         </span>
@@ -247,43 +257,48 @@ export default function Uploader() {
                 </div>
 
                 {/* Card 3: Regla de Desidentificación */}
-                <div className="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-3 shadow-2xs">
+                <div className="p-5 rounded-xl bg-card border border-border space-y-3 shadow-sm hover:border-primary/50 hover:shadow-md transition-all group">
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono font-semibold tracking-wider uppercase text-slate-500">
-                            REGLA DE DESIDENTIFICACIÓN
+                        <span className="text-[10px] font-mono font-semibold tracking-wider uppercase text-muted-foreground">
+                            DESIDENTIFICACIÓN LFPDPPP
                         </span>
                         <Shield className="w-3.5 h-3.5 text-emerald-600" />
                     </div>
-                    <div>
-                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white">
-                            Cumplimiento LFPDPPP Local
-                        </h4>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                            Nombres, RFC, CURP y CLABEs reemplazados por seudónimos criptográficos.
-                        </p>
+                    <div className="flex items-start gap-3">
+                        <div className="p-2.5 rounded-lg bg-muted text-accent-foreground shrink-0">
+                            <Shield className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h4 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                                Seudónimos Criptográficos
+                            </h4>
+                            <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                                Nombres, RFC, CURP y CLABEs reemplazados por tokens reversibles en local.
+                            </p>
+                        </div>
                     </div>
-                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                        <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-indigo-600 dark:text-indigo-400">
+                    <div className="pt-2 border-t border-border">
+                        <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-accent-foreground">
                             <SlidersHorizontal className="w-3 h-3" />
-                            <span>Diccionario de bufete activo</span>
+                            <span>Diccionario de despacho activo</span>
                         </span>
                     </div>
                 </div>
             </div>
 
             {/* Bottom Security Assurance Strip */}
-            <div className="py-3 px-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200/60 dark:border-slate-800 flex flex-wrap items-center justify-around gap-4 text-xs text-slate-600 dark:text-slate-400 font-medium">
+            <div className="py-3 px-4 rounded-xl bg-card border border-border flex flex-wrap items-center justify-around gap-4 text-xs text-muted-foreground font-medium shadow-xs">
                 <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                    <span>100% procesamiento local en CPU/GPU del cliente</span>
+                    <span>100% procesamiento local en servidor del despacho</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <Shield className="w-3.5 h-3.5 text-emerald-600" />
                     <span>0 bytes transferidos a nubes públicas sin enmascarar</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <FolderLock className="w-3.5 h-3.5 text-slate-500" />
-                    <span>Cero retención externa de datos sensibles</span>
+                    <FolderLock className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span>Cero retención persistente de contratos crudos</span>
                 </div>
             </div>
         </div>

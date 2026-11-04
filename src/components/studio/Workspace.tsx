@@ -355,32 +355,32 @@ export default function Workspace() {
             )}
 
             {/* Barra de Control Superior */}
-            <div className="px-6 py-2.5 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 flex items-center justify-between gap-4 shrink-0">
+            <div className="px-6 py-2.5 bg-card border-b border-border flex items-center justify-between gap-4 shrink-0">
                 <div className="flex items-center gap-3 min-w-0">
                     <button
                         type="button"
                         onClick={reset}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         <span>Documentos</span>
                     </button>
 
-                    <div className="h-4 w-px bg-slate-200 dark:bg-slate-800" />
+                    <div className="h-4 w-px bg-border" />
 
                     <div className="flex items-center gap-2 min-w-0">
-                        <FileText className="w-4 h-4 text-indigo-600 shrink-0" />
-                        <h2 className="text-sm font-semibold text-slate-900 dark:text-white truncate max-w-[280px] sm:max-w-[420px]">
+                        <FileText className="w-4 h-4 text-primary shrink-0" />
+                        <h2 className="text-sm font-semibold text-foreground truncate max-w-[280px] sm:max-w-[420px]">
                             {file.name}
                         </h2>
                     </div>
 
                     <div className="hidden sm:flex items-center gap-2">
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-muted text-foreground border border-border">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                             Modo Seguro Activo
                         </span>
-                        <span className="font-mono text-[11px] text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200/60 dark:border-slate-700">
+                        <span className="font-mono text-[11px] text-muted-foreground bg-muted px-2 py-0.5 rounded border border-border">
                             SHA: 4f8e...e901
                         </span>
                     </div>
@@ -391,7 +391,7 @@ export default function Workspace() {
                         variant="ghost"
                         size="sm"
                         onClick={handleOpenBlacklist}
-                        className="text-xs text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                        className="text-xs text-muted-foreground hover:text-foreground cursor-pointer"
                     >
                         <List className="w-3.5 h-3.5 mr-1.5" />
                         Excepciones
@@ -402,7 +402,7 @@ export default function Workspace() {
                         size="sm"
                         onClick={handleDownload}
                         disabled={isDownloading}
-                        className="text-xs border-slate-200 dark:border-slate-700 font-medium text-slate-700 dark:text-slate-300"
+                        className="text-xs border-border font-medium text-foreground hover:bg-muted cursor-pointer"
                     >
                         <Download className="w-3.5 h-3.5 mr-1.5" />
                         {isDownloading ? 'Generando...' : 'Exportar Testado'}
@@ -411,7 +411,7 @@ export default function Workspace() {
                     <Button
                         size="sm"
                         onClick={() => setIsChatOpen(true)}
-                        className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-2xs flex items-center gap-1.5"
+                        className="text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg shadow-sm flex items-center gap-1.5 cursor-pointer"
                     >
                         <Sparkles className="w-3.5 h-3.5" />
                         <span>Copiloto Jurídico</span>
@@ -420,10 +420,10 @@ export default function Workspace() {
             </div>
 
             {/* Sub-barra de Aislamiento */}
-            <div className="px-6 py-1 bg-slate-100/60 dark:bg-slate-900/40 border-b border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between text-[11px] text-slate-500">
+            <div className="px-6 py-1 bg-muted/40 border-b border-border flex items-center justify-between text-[11px] text-muted-foreground">
                 <div className="flex items-center gap-1.5">
                     <Lock className="w-3 h-3 text-emerald-600" />
-                    <span>Entorno Aislado: El texto no abandona el espacio de memoria RAM del navegador</span>
+                    <span>Entorno Aislado: El texto no abandona el espacio de memoria RAM del servidor</span>
                 </div>
                 <div className="hidden sm:flex items-center gap-3 font-mono">
                     <span>99.8% confianza de extracción NER</span>
@@ -432,14 +432,14 @@ export default function Workspace() {
 
             {/* Modal de Lista Negra / Excepciones */}
             {showBlacklist && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs">
-                    <div className="w-[460px] bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-150 overflow-hidden">
-                        <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                            <h3 className="font-semibold text-sm text-slate-900 dark:text-white">Palabras Ignoradas (Excepciones)</h3>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs">
+                    <div className="w-[460px] bg-card rounded-xl shadow-xl border border-border animate-in zoom-in-95 duration-150 overflow-hidden">
+                        <div className="px-5 py-4 border-b border-border flex justify-between items-center">
+                            <h3 className="font-semibold text-sm text-foreground">Palabras Ignoradas (Excepciones)</h3>
                             <button
                                 type="button"
                                 onClick={() => setShowBlacklist(false)}
-                                className="text-slate-400 hover:text-slate-600 p-1 rounded-full"
+                                className="text-muted-foreground hover:text-foreground p-1 rounded-full cursor-pointer"
                             >
                                 <X className="w-4 h-4" />
                             </button>
@@ -447,9 +447,9 @@ export default function Workspace() {
                         <div className="p-0">
                             <ScrollArea className="h-[340px] w-full p-4">
                                 {isLoadingBlacklist ? (
-                                    <div className="text-center py-10 text-xs text-slate-400">Cargando excepciones...</div>
+                                    <div className="text-center py-10 text-xs text-muted-foreground">Cargando excepciones...</div>
                                 ) : blacklistItems.length === 0 ? (
-                                    <div className="text-center py-10 text-xs text-slate-500">
+                                    <div className="text-center py-10 text-xs text-muted-foreground">
                                         No hay palabras en la lista personal de excepciones.
                                     </div>
                                 ) : (
@@ -457,12 +457,12 @@ export default function Workspace() {
                                         {blacklistItems.map((item) => (
                                             <div
                                                 key={item.id}
-                                                className="flex justify-between items-center px-3 py-2 border border-slate-200/70 dark:border-slate-800 rounded-lg bg-slate-50/50 dark:bg-slate-800/30"
+                                                className="flex justify-between items-center px-3 py-2 border border-border rounded-lg bg-muted/30"
                                             >
-                                                <span className="font-mono text-xs text-slate-800 dark:text-slate-200">{item.text}</span>
+                                                <span className="font-mono text-xs text-foreground">{item.text}</span>
                                                 <button
                                                     type="button"
-                                                    className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded"
+                                                    className="text-destructive hover:text-destructive/80 p-1 hover:bg-destructive/10 rounded cursor-pointer"
                                                     onClick={() => handleDeleteFromBlacklist(item.id, item.text)}
                                                 >
                                                     <Trash2 className="w-3.5 h-3.5" />
@@ -479,15 +479,15 @@ export default function Workspace() {
 
             {/* Layout Principal: Canvas de Hoja de Papel + Sidebar Lateral */}
             <div className="flex-1 min-h-0 flex overflow-hidden">
-                {/* Lienzo del Contrato (Lado Izquierdo / Centro) con fondo porcelana/slate */}
-                <div className="flex-1 min-h-0 flex flex-col overflow-hidden bg-slate-100/70 dark:bg-slate-950/80">
+                {/* Lienzo del Contrato con fondo suave */}
+                <div className="flex-1 min-h-0 flex flex-col overflow-hidden bg-muted/30">
                     {/* Contenedor scrolleable con margen exterior y centrado de hoja */}
                     <div className="flex-1 min-h-0 w-full overflow-y-auto px-4 py-8 sm:px-12">
                         {/* Hoja de papel legal centrada con sombra, borde y paddings internos reales */}
                         <div
                             ref={textContainerRef}
                             onMouseUp={handleMouseUp}
-                            className="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm rounded-md p-8 sm:p-14 max-w-3xl mx-auto my-2 whitespace-pre-wrap font-sans text-sm sm:text-[15px] leading-relaxed text-slate-800 dark:text-slate-200 select-text"
+                            className="bg-card border border-border shadow-sm rounded-lg p-8 sm:p-14 max-w-3xl mx-auto my-2 whitespace-pre-wrap font-sans text-sm sm:text-[15px] leading-relaxed text-foreground select-text"
                             style={{ minHeight: '850px' }}
                         >
                             {renderHighlightedText()}
@@ -495,18 +495,18 @@ export default function Workspace() {
                     </div>
 
                     {/* Barra Inferior de Navegación y Zoom */}
-                    <div className="px-6 py-2 bg-white dark:bg-slate-900 border-t border-slate-200/70 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 shrink-0">
+                    <div className="px-6 py-2 bg-card border-t border-border flex items-center justify-between text-xs text-muted-foreground shrink-0">
                         <div className="flex items-center gap-2">
                             <span>Página</span>
-                            <div className="inline-flex items-center border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 font-mono text-[11px]">
-                                <ChevronLeft className="w-3 h-3 text-slate-400" />
-                                <span className="px-1 text-slate-700 dark:text-slate-200">1 / 1</span>
-                                <ChevronRight className="w-3 h-3 text-slate-400" />
+                            <div className="inline-flex items-center border border-border rounded px-1.5 py-0.5 font-mono text-[11px]">
+                                <ChevronLeft className="w-3 h-3 text-muted-foreground" />
+                                <span className="px-1 text-foreground">1 / 1</span>
+                                <ChevronRight className="w-3 h-3 text-muted-foreground" />
                             </div>
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-1.5 text-slate-400 font-mono text-[11px]">
+                            <div className="flex items-center gap-1.5 text-muted-foreground font-mono text-[11px]">
                                 <ZoomIn className="w-3 h-3" />
                                 <span>100%</span>
                             </div>
@@ -519,12 +519,12 @@ export default function Workspace() {
                 </div>
 
                 {/* Sidebar Derecho: Panel de Entidades Agrupadas */}
-                <div className="w-80 sm:w-96 border-l border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col min-h-0 shrink-0 overflow-hidden">
+                <div className="w-80 sm:w-96 border-l border-border bg-card flex flex-col min-h-0 shrink-0 overflow-hidden">
                     {/* Header Sidebar */}
-                    <div className="p-4 border-b border-slate-100 dark:border-slate-800 space-y-3 shrink-0">
+                    <div className="p-4 border-b border-border space-y-3 shrink-0">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <h3 className="font-semibold text-sm text-slate-900 dark:text-white">
+                                <h3 className="font-semibold text-sm text-foreground">
                                     Entidades Detectadas
                                 </h3>
                                 <Badge variant="secondary" className="text-xs px-2 py-0.2">
@@ -534,7 +534,7 @@ export default function Workspace() {
                             <button
                                 type="button"
                                 onClick={() => handleToggleAll(approvedEntities.length !== activeEntities.length)}
-                                className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                                className="text-[11px] font-semibold text-primary hover:underline cursor-pointer"
                             >
                                 {approvedEntities.length === activeEntities.length ? 'Desmarcar todas' : 'Testar todas'}
                             </button>
@@ -542,18 +542,18 @@ export default function Workspace() {
 
                         {/* Cobertura de Anonimización */}
                         <div className="space-y-1.5 pt-1">
-                            <div className="flex items-center justify-between text-xs text-slate-500">
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
                                 <span>Cobertura de anonimización</span>
-                                <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">
+                                <span className="font-mono font-semibold text-foreground">
                                     {coveragePercent}%
                                 </span>
                             </div>
-                            <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden flex">
+                            <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden flex">
                                 <div className="h-full bg-sky-500 w-[35%]" title="Personas Físicas" />
                                 <div className="h-full bg-purple-500 w-[30%]" title="Personas Jurídicas" />
                                 <div className="h-full bg-emerald-500 w-[35%]" title="Datos Financieros" />
                             </div>
-                            <div className="flex items-center justify-between text-[10px] text-slate-400 font-medium pt-0.5">
+                            <div className="flex items-center justify-between text-[10px] text-muted-foreground font-medium pt-0.5">
                                 <span className="flex items-center gap-1">
                                     <span className="w-1.5 h-1.5 rounded-full bg-sky-500" /> Físicas
                                 </span>
@@ -574,9 +574,9 @@ export default function Workspace() {
 
                             return (
                                 <div key={groupTitle} className="space-y-2">
-                                    <div className="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider text-[11px]">
+                                    <div className="flex items-center justify-between text-xs font-semibold text-muted-foreground uppercase tracking-wider text-[11px]">
                                         <span>{groupTitle}</span>
-                                        <span className="font-mono text-slate-400">({items.length})</span>
+                                        <span className="font-mono text-muted-foreground">({items.length})</span>
                                     </div>
 
                                     <div className="space-y-1.5">
@@ -645,12 +645,12 @@ export default function Workspace() {
                     </div>
 
                     {/* Footer Zero-Trust */}
-                    <div className="p-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20 text-[11px] text-slate-500 space-y-1">
-                        <div className="flex items-center gap-1.5 font-semibold text-slate-700 dark:text-slate-300">
+                    <div className="p-3.5 border-t border-border bg-muted/20 text-[11px] text-muted-foreground space-y-1">
+                        <div className="flex items-center gap-1.5 font-semibold text-foreground">
                             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                             <span>Arquitectura Zero-Trust Local</span>
                         </div>
-                        <p className="text-[10px] leading-tight text-slate-400">
+                        <p className="text-[10px] leading-tight text-muted-foreground">
                             Todos los reemplazos y análisis sintácticos se ejecutan estrictamente en tu equipo.
                         </p>
                     </div>

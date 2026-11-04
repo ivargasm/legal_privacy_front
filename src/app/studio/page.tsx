@@ -13,15 +13,15 @@ export default function StudioPage() {
     return (
         <ProtectedRoute>
             {status === 'idle' || status === 'error' ? (
-                <main className="w-full min-h-[calc(100vh-3.75rem)] mt-15 py-8 px-4 sm:px-6 bg-[#FAFAFA] dark:bg-slate-950 flex flex-col items-center justify-center">
+                <main className="w-full min-h-[calc(100vh-3.75rem)] mt-15 py-8 px-4 sm:px-6 bg-background flex flex-col items-center justify-center">
                     <Uploader />
                 </main>
             ) : status === 'analyzing' ? (
-                <main className="w-full h-[calc(100vh-3.75rem)] mt-15 p-4 sm:p-6 bg-[#FAFAFA] dark:bg-slate-950">
+                <main className="w-full h-[calc(100vh-3.75rem)] mt-15 p-4 sm:p-6 bg-background">
                     <WorkspaceSkeleton />
                 </main>
             ) : (
-                <main className="w-full h-[calc(100vh-3.75rem)] mt-15 overflow-hidden">
+                <main className="w-full h-[calc(100vh-3.75rem)] mt-15 overflow-hidden bg-background">
                     <Workspace />
                 </main>
             )}

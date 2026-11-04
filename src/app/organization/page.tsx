@@ -447,7 +447,7 @@ export default function OrganizationPage() {
 
     return (
         <ProtectedRoute>
-            <div className="w-full min-h-[calc(100vh-3.75rem)] mt-15 py-8 px-4 sm:px-6 bg-[#FAFAFA] dark:bg-slate-950 pb-20">
+            <div className="w-full min-h-[calc(100vh-3.75rem)] mt-15 py-8 px-4 sm:px-6 bg-background pb-20">
                 <div className="max-w-6xl mx-auto space-y-6">
                     {/* Header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-6">
@@ -489,7 +489,7 @@ export default function OrganizationPage() {
                                 <Button
                                     size="sm"
                                     onClick={() => setIsInviteOpen(true)}
-                                    className="text-xs h-9 bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
+                                    className="text-xs h-9 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-xs cursor-pointer"
                                 >
                                     <UserPlus className="w-3.5 h-3.5 mr-1.5" />
                                     Invitar Miembro
@@ -499,19 +499,19 @@ export default function OrganizationPage() {
                     </div>
 
                     {/* Navigation Tabs Switcher */}
-                    <div className="flex items-center gap-3 border-b border-slate-200/80 dark:border-slate-800 pb-1">
+                    <div className="flex items-center gap-3 border-b border-border pb-1">
                         <button
                             type="button"
                             onClick={() => setActiveTab('team')}
-                            className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all ${
+                            className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer ${
                                 activeTab === 'team'
-                                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs border border-slate-200/80 dark:border-slate-800 font-semibold'
-                                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-900/40'
+                                    ? 'bg-card text-foreground shadow-xs border border-border font-semibold'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
                             }`}
                         >
                             <Users className="w-4 h-4" />
                             <span>Miembros y Despacho</span>
-                            <span className="ml-1 text-[11px] font-mono px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                            <span className="ml-1 text-[11px] font-mono px-1.5 py-0.2 rounded-full bg-muted text-muted-foreground">
                                 {members.length}
                             </span>
                         </button>
@@ -519,10 +519,10 @@ export default function OrganizationPage() {
                         <button
                             type="button"
                             onClick={() => setActiveTab('billing')}
-                            className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all ${
+                            className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer ${
                                 activeTab === 'billing'
-                                    ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs border border-slate-200/80 dark:border-slate-800 font-semibold'
-                                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-900/40'
+                                    ? 'bg-card text-foreground shadow-xs border border-border font-semibold'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
                             }`}
                         >
                             <CreditCard className="w-4 h-4" />
@@ -532,8 +532,8 @@ export default function OrganizationPage() {
                                     variant="outline"
                                     className={`text-[10px] px-1.5 py-0.2 font-mono uppercase ${
                                         billingStatus.plan_tier === 'free'
-                                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-                                            : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
+                                            ? 'bg-muted text-muted-foreground border-border'
+                                            : 'bg-accent/30 text-accent-foreground border-accent/40'
                                     }`}
                                 >
                                     {billingStatus.plan_tier === 'free' ? 'Prueba' : billingStatus.plan_tier}
@@ -545,17 +545,17 @@ export default function OrganizationPage() {
                             <button
                                 type="button"
                                 onClick={() => setActiveTab('audit')}
-                                className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all ${
+                                className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-all cursor-pointer ${
                                     activeTab === 'audit'
-                                        ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs border border-slate-200/80 dark:border-slate-800 font-semibold'
-                                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100/60 dark:hover:bg-slate-900/40'
+                                        ? 'bg-card text-foreground shadow-xs border border-border font-semibold'
+                                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
                                 }`}
                             >
                                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
                                 <span>Bitácora y Cumplimiento</span>
                                 <Badge
                                     variant="outline"
-                                    className="text-[10px] px-1.5 py-0.2 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 font-mono"
+                                    className="text-[10px] px-1.5 py-0.2 bg-muted text-foreground border-border font-mono"
                                 >
                                     Auditoría
                                 </Badge>
