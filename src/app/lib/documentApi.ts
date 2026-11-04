@@ -138,6 +138,44 @@ export async function reindexPublicLaws(documentId?: number) {
     return res.json();
 }
 
+export interface ReplacementItem {
+    text: string;
+    placeholder: string;
+    entity_type?: string;
+}
+
+export interface SanitizedPrecedentPayload {
+    title: string;
+    raw_text: string;
+    replacements: ReplacementItem[];
+}
+
+export async function uploadSanitizedPrecedent(
+    payload: SanitizedPrecedentPayload,
+    activeOrgId?: number | null
+) {
+    const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+    };
+    const orgId = activeOrgId || (typeof window !== 'undefined' ? localStorage.getItem('active_org_id') : null);
+    if (orgId) {
+        headers['X-Organization-Id'] = String(orgId);
+    }
+
+    const res = await fetch(`${API_URL}/api/v1/library/upload_sanitized_precedent`, {
+        method: 'POST',
+        credentials: 'include',
+        headers,
+        body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+        await throwHandledApiError(res, 'Error al indexar machote en el acervo del despacho');
+    }
+
+    return res.json();
+}
+
 export async function uploadPublicLaw(file: File, scope: 'PUBLIC' | 'ORGANIZATION' = 'PUBLIC') {
     const formData = new FormData();
     formData.append('file', file);
